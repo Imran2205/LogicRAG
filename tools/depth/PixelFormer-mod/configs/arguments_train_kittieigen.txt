@@ -1,0 +1,33 @@
+--mode train
+--model_name pixelformer_kittieigen
+--encoder large07
+--pretrain /kaggle/input/swintransfomerlargeimagenet/swin_large_patch4_window7_224_22k.pth
+--dataset kitti
+--data_path /kaggle/input/
+--gt_path /kaggle/input/kittidatasetmonocular/train/
+--filenames_file PixelFormer-mod/data_splits/eigen_train_files_with_gt_kgl2.txt
+--batch_size 1
+--num_epochs 20
+--learning_rate 4e-5
+--weight_decay 1e-2
+--adam_eps 1e-3
+--num_threads 1
+--input_height 352
+--input_width 1120
+--max_depth 80
+--do_kb_crop
+--do_random_rotate
+--degree 1.0
+--log_directory ./models/
+--multiprocessing_distributed
+--dist_url tcp://127.0.0.1:1234
+
+--log_freq 100
+--do_online_eval
+--eval_freq 1000
+--data_path_eval /kaggle/input/
+--gt_path_eval /kaggle/input/kittidatasetmonocular/val/
+--filenames_file_eval PixelFormer-mod/data_splits/eigen_test_files_with_gt_kgl.txt
+--min_depth_eval 1e-3
+--max_depth_eval 80
+--garg_crop

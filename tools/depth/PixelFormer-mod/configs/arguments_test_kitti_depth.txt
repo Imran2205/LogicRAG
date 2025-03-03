@@ -1,0 +1,11 @@
+--model_name pixelformer_kittieigen
+--encoder large07
+--dataset kitti
+--input_height 352
+--input_width 1216
+--max_depth 80
+--do_kb_crop
+
+--data_path /data/datasets/KITTI/STEP
+--filenames_file /data/projects/PixelFormer-mod/test.txt
+--checkpoint_path /data/projects/PixelFormer-mod/weights/kitti.pth

@@ -1,0 +1,9 @@
+for youtube vos instance segmentation, downloaded train and valid json files from : https://codalab.lisn.upsaclay.fr/competitions/6064#participate-get_data
+
+refer to labels google drive link
+
+set from torch.cuda.amp import autocast to
+from torch.amp import autocast
+
+set autocast(enabled=False) to
+autocast('cuda', enabled=False)

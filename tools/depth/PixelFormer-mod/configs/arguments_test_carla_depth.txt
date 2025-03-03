@@ -1,0 +1,10 @@
+--model_name pixelformer_kittieigen
+--encoder large07
+--dataset carla_depth
+--input_height 375
+--input_width 1242
+--max_depth 1000
+
+--data_path /data/datasets/KITTI/STEP
+--filenames_file /data/projects/PixelFormer-mod/test.txt
+--checkpoint_path /data/projects/PixelFormer-mod/weights/kitti.pth
