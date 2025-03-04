@@ -76,7 +76,7 @@ VEHICLE_TYPE_MAPPING = {
 }
 
 # Constants for position determination
-DISTANCE_THRESHOLD = 30  # Z distance threshold for Near/Far
+DISTANCE_THRESHOLD = 50  # Z distance threshold for Near/Far
 SPEED_THRESHOLD_VEHICLE = 1.0  # Threshold for Moving/NotMoving for vehicles
 SPEED_THRESHOLD_PEDESTRIAN = 0.3  # Threshold for Moving/NotMoving for pedestrians
 SLOPE_THRESHOLD = 0.3  # Threshold for SpeedUp/SpeedDown/DistanceIncrease/DistanceDecrease
@@ -463,7 +463,10 @@ def build_kb_for_window(track_data, window_start, window_size=10, rules_file=Non
 
             if first_coords and last_coords:
                 # Determine positions
-                max_x = 1242  # Assuming image width
+                if DATASET == 'KITTI':
+                    max_x = 1242  # Assuming image width
+                else:
+                    max_x = 480
 
                 first_x, first_z = cent_first[0], first_coords[2]
                 last_x, last_z = cent_last[0], last_coords[2]
@@ -779,7 +782,7 @@ def main():
     os.makedirs(args.output_dir, exist_ok=True)
 
     video_list = [vid for vid in os.listdir(args.tracker_dir) if os.path.isdir(os.path.join(args.tracker_dir, vid))]
-    video_list = natsorted(video_list)  # [:1]  # [1:2]
+    video_list = natsorted(video_list)  # [16:]  # [:1]  # [1:2]
     # print(video_list)
 
     for video_name in tqdm(video_list):
