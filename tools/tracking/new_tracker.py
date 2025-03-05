@@ -70,7 +70,7 @@ def map_labels_to_custom(label_id):
 
 
 class InstanceTracker:
-    def __init__(self, max_lost_frames=5, iou_threshold=0.1, flow_weight=0.5, min_obj_size=10,
+    def __init__(self, max_lost_frames=5, iou_threshold=0.1, flow_weight=0.5, min_obj_size=20,
                  type_model_path=None, color_model_path=None):
         self.max_lost_frames = max_lost_frames
         self.iou_threshold = iou_threshold
@@ -296,13 +296,14 @@ class InstanceTracker:
             return {"unknown": 1.0}, {"unknown": 1.0}
 
     def load_label_mask(self, path):
-        """Load panoptic label mask with class_id in first channel and instance_id in the other channels"""
         mask = np.array(Image.open(path))
 
-        class_mask = mask[:, :, 0].astype(np.int32)
-        instance_id = (mask[:, :, 1].astype(np.int32) << 8) | mask[:, :, 2].astype(np.int32)
-
-        # print(np.unique(class_mask), np.unique(instance_id))
+        if len(list(mask.shape)) > 2 and mask.shape[-1] > 1:
+            class_mask = mask[:, :, 0].astype(np.int32)
+            instance_id = (mask[:, :, 1].astype(np.int32) << 8) | mask[:, :, 2].astype(np.int32)
+        else:
+            class_mask = mask.copy()
+            instance_id = mask.copy()
 
         return class_mask, instance_id
 
@@ -459,7 +460,6 @@ class InstanceTracker:
         """Extract instance information from masks"""
         instances = []
 
-        # First, handle vehicles and pedestrians as before using instance_id
         unique_instances = np.unique(instance_id)
         for inst_id in unique_instances:
             if inst_id == 0:  # Skip background
@@ -483,62 +483,69 @@ class InstanceTracker:
                 if not contours:
                     continue
 
-                largest_contour = max(contours, key=cv2.contourArea)
-                area = cv2.contourArea(largest_contour)
-                x, y, w, h = cv2.boundingRect(largest_contour)
+                for contour in contours:
+                    largest_contour = contour  # max(contours, key=cv2.contourArea)
+                    area = cv2.contourArea(largest_contour)
+                    x, y, w, h = cv2.boundingRect(largest_contour)
 
-                # Skip if both width and height are too small
-                if w < self.min_obj_size and h < self.min_obj_size:
-                    continue
+                    # Skip if both width and height are too small
+                    if w < self.min_obj_size and h < self.min_obj_size:
+                        continue
 
-                # Calculate centroid
-                M = cv2.moments(largest_contour)
-                if M["m00"] > 0:
-                    cx = int(M["m10"] / M["m00"])
-                    cy = int(M["m01"] / M["m00"])
-                else:
-                    cx, cy = x + w // 2, y + h // 2
+                    # Calculate centroid
+                    M = cv2.moments(largest_contour)
+                    if M["m00"] > 0:
+                        cx = int(M["m10"] / M["m00"])
+                        cy = int(M["m01"] / M["m00"])
+                    else:
+                        cx, cy = x + w // 2, y + h // 2
 
-                # Store instance info
-                if mapped_class == 10:  # vehicles class
-                    # Get the specific vehicle type
-                    vehicle_type = self.get_vehicle_type(class_mask, inst_mask)
-                    # Get the vehicle color if RGB image is available
-                    vehicle_color = self.detect_vehicle_color(rgb_image,
-                                                              inst_mask) if rgb_image is not None else "unknown"
+                    contour_mask = np.zeros(inst_mask.shape, dtype=np.uint8)
 
-                    # Get model predictions if models are loaded
-                    pred_type, pred_color = {}, {}
-                    if rgb_image is not None and self.models_loaded:
-                        pred_type, pred_color = self.predict_with_models(rgb_image, inst_mask)
+                    cv2.drawContours(contour_mask, [contour], contourIdx=0, color=255, thickness=cv2.FILLED)
 
-                    instances.append({
-                        'class_id': mapped_class,
-                        'instance_id': inst_id,
-                        'mask': inst_mask,
-                        'bbox': (x, y, w, h),
-                        'centroid': (cx, cy),
-                        'area': area,
-                        'frame_idx': frame_idx,
-                        'type': vehicle_type,
-                        'color': vehicle_color,
-                        'pred_type': pred_type,
-                        'pred_color': pred_color
-                    })
-                else:  # pedestrian class
-                    instances.append({
-                        'class_id': mapped_class,
-                        'instance_id': inst_id,
-                        'mask': inst_mask,
-                        'bbox': (x, y, w, h),
-                        'centroid': (cx, cy),
-                        'area': area,
-                        'frame_idx': frame_idx,
-                        'type': 'NA',
-                        'color': 'NA',
-                        'pred_type': 'NA',
-                        'pred_color': 'NA'
-                    })
+                    contour_mask = contour_mask.astype(bool)
+
+                    # Store instance info
+                    if mapped_class == 10:  # vehicles class
+                        # Get the specific vehicle type
+                        vehicle_type = self.get_vehicle_type(class_mask, contour_mask)
+                        # Get the vehicle color if RGB image is available
+                        vehicle_color = self.detect_vehicle_color(rgb_image,
+                                                                  contour_mask) if rgb_image is not None else "unknown"
+
+                        # Get model predictions if models are loaded
+                        pred_type, pred_color = {}, {}
+                        if rgb_image is not None and self.models_loaded:
+                            pred_type, pred_color = self.predict_with_models(rgb_image, contour_mask)
+
+                        instances.append({
+                            'class_id': mapped_class,
+                            'instance_id': inst_id,
+                            'mask': contour_mask,
+                            'bbox': (x, y, w, h),
+                            'centroid': (cx, cy),
+                            'area': area,
+                            'frame_idx': frame_idx,
+                            'type': vehicle_type,
+                            'color': vehicle_color,
+                            'pred_type': pred_type,
+                            'pred_color': pred_color
+                        })
+                    else:  # pedestrian class
+                        instances.append({
+                            'class_id': mapped_class,
+                            'instance_id': inst_id,
+                            'mask': contour_mask,
+                            'bbox': (x, y, w, h),
+                            'centroid': (cx, cy),
+                            'area': area,
+                            'frame_idx': frame_idx,
+                            'type': 'NA',
+                            'color': 'NA',
+                            'pred_type': 'NA',
+                            'pred_color': 'NA'
+                        })
 
         # Now, handle other classes using connected components
         # Create a dictionary to track instance counts per class
@@ -1587,7 +1594,7 @@ def process_video(video_dir, output_dir, video_name, rgb_base_dir=None, type_mod
         max_lost_frames=5,
         flow_weight=0.75,
         iou_threshold=0.1,
-        min_obj_size=10,
+        min_obj_size=20,
         type_model_path=type_model_path,
         color_model_path=color_model_path
     )
@@ -1732,7 +1739,7 @@ def main():
     os.makedirs(args.output_dir, exist_ok=True)
 
     # Find all video directories
-    video_dirs = natsorted([f.path for f in os.scandir(args.parent_dir) if f.is_dir()])[:15]  # [5:]  # [20:]
+    video_dirs = natsorted([f.path for f in os.scandir(args.parent_dir) if f.is_dir()])[15:]  # [5:]  # [20:]
 
     # print(video_dirs)
 
