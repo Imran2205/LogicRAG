@@ -77,10 +77,11 @@ VEHICLE_TYPE_MAPPING = {
 
 # Constants for position determination
 DISTANCE_THRESHOLD = 50  # Z distance threshold for Near/Far
-SPEED_THRESHOLD_VEHICLE = 1.0  # Threshold for Moving/NotMoving for vehicles
-SPEED_THRESHOLD_PEDESTRIAN = 0.3  # Threshold for Moving/NotMoving for pedestrians
-SLOPE_THRESHOLD = 0.3  # Threshold for SpeedUp/SpeedDown/DistanceIncrease/DistanceDecrease
-VERY_CLOSE_DISTANCE = 0.5  # Threshold for TooClose predicate
+SPEED_THRESHOLD_VEHICLE = 0.5  # Threshold for Moving/NotMoving for vehicles
+SPEED_THRESHOLD_PEDESTRIAN = 0.1  # Threshold for Moving/NotMoving for pedestrians
+VEL_SLOPE_THRESHOLD = 0.3  # Threshold for SpeedUp/SpeedDown
+DIST_SLOPE_THRESHOLD = 0.5  # Threshold for DistanceIncrease/DistanceDecrease
+VERY_CLOSE_DISTANCE = 0.3  # Threshold for TooClose predicate
 ZERO_DISTANCE_THRESHOLD = 0.1  # Threshold for DistanceZeroStart/DistanceZeroEnd
 
 
@@ -536,14 +537,14 @@ def build_kb_for_window(track_data, window_start, window_size=10, rules_file=Non
                     # print(slope)
                     # print("*" * 40)
 
-                    if slope > SLOPE_THRESHOLD:
+                    if slope > VEL_SLOPE_THRESHOLD:
                         KB.tell(aima.utils.expr(f"SpeedUp({obj_id})"))
                         all_predicates.append(f"SpeedUp({obj_id})")
                     else:
                         KB.tell(aima.utils.expr(f"NotSpeedUp({obj_id})"))
                         all_predicates.append(f"NotSpeedUp({obj_id})")
 
-                    if slope < -SLOPE_THRESHOLD:
+                    if slope < -VEL_SLOPE_THRESHOLD:
                         KB.tell(aima.utils.expr(f"SpeedDown({obj_id})"))
                         all_predicates.append(f"SpeedDown({obj_id})")
                     else:
@@ -621,14 +622,14 @@ def build_kb_for_window(track_data, window_start, window_size=10, rules_file=Non
             all_predicates.append(f"DistanceZeroEnd({obj1_id}, {obj2_id})")
 
         # Determine if distance is increasing or decreasing
-        if slope > SLOPE_THRESHOLD:
+        if slope > DIST_SLOPE_THRESHOLD:
             KB.tell(aima.utils.expr(f"DistanceIncrease({obj1_id}, {obj2_id})"))
             all_predicates.append(f"DistanceIncrease({obj1_id}, {obj2_id})")
         else:
             KB.tell(aima.utils.expr(f"NotDistanceIncrease({obj1_id}, {obj2_id})"))
             all_predicates.append(f"NotDistanceIncrease({obj1_id}, {obj2_id})")
 
-        if slope < -SLOPE_THRESHOLD:
+        if slope < -DIST_SLOPE_THRESHOLD:
             KB.tell(aima.utils.expr(f"DistanceDecrease({obj1_id}, {obj2_id})"))
             all_predicates.append(f"DistanceDecrease({obj1_id}, {obj2_id})")
         else:
@@ -782,7 +783,7 @@ def main():
     os.makedirs(args.output_dir, exist_ok=True)
 
     video_list = [vid for vid in os.listdir(args.tracker_dir) if os.path.isdir(os.path.join(args.tracker_dir, vid))]
-    video_list = natsorted(video_list)  # [16:]  # [:1]  # [1:2]
+    video_list = natsorted(video_list)[15:16]  # [:1]  # [1:2]
     # print(video_list)
 
     for video_name in tqdm(video_list):
