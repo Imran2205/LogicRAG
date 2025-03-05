@@ -316,7 +316,7 @@ class InstanceTracker:
             img_shape: (height, width) of the target image
 
         Returns:
-            Padded depth map or None if loading fails
+            Padded depth map
         """
         target_h, target_w = img_shape
 
@@ -359,102 +359,6 @@ class InstanceTracker:
             except Exception as e:
                 print(f"Error loading flow data from {path}: {e}")
         return None
-
-    # def extract_instances(self, class_mask, instance_id, frame_idx, rgb_image=None):
-    #     """Extract instance information from masks"""
-    #     instances = []
-    #     unique_instances = np.unique(instance_id)
-    #
-    #     for inst_id in unique_instances:
-    #         if inst_id == 0:  # Skip background
-    #             continue
-    #
-    #         # Create binary mask for this instance
-    #         inst_mask = (instance_id == inst_id)
-    #
-    #         # Get the class ID for this instance (use the most common class in the instance)
-    #         class_ids = class_mask[inst_mask]
-    #         if len(class_ids) == 0:
-    #             continue
-    #
-    #         most_common_class = np.bincount(class_ids).argmax()
-    #         mapped_class = map_labels_to_custom(most_common_class)
-    #
-    #         # print(np.unique(class_ids), most_common_class,  mapped_class)
-    #
-    #         # print(inst_mask)
-    #
-    #         # Skip very small objects
-    #         contours, _ = cv2.findContours(inst_mask.astype(np.uint8), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-    #         if not contours:
-    #             continue
-    #
-    #         largest_contour = max(contours, key=cv2.contourArea)
-    #         area = cv2.contourArea(largest_contour)
-    #         x, y, w, h = cv2.boundingRect(largest_contour)
-    #
-    #         # Skip if both width and height are too small
-    #         if w < self.min_obj_size and h < self.min_obj_size:
-    #             continue
-    #
-    #         # Calculate centroid
-    #         M = cv2.moments(largest_contour)
-    #         if M["m00"] > 0:
-    #             cx = int(M["m10"] / M["m00"])
-    #             cy = int(M["m01"] / M["m00"])
-    #         else:
-    #             cx, cy = x + w // 2, y + h // 2
-    #
-    #         # Store instance info
-    #         if mapped_class == 10:  # vehicles class
-    #             # Get the specific vehicle type
-    #             vehicle_type = self.get_vehicle_type(class_mask, inst_mask)
-    #             # Get the vehicle color if RGB image is available
-    #             vehicle_color = self.detect_vehicle_color(rgb_image, inst_mask) if rgb_image is not None else "unknown"
-    #
-    #             vehicle_type = self.get_vehicle_type(class_mask, inst_mask)
-    #             # Get the vehicle color using the current method
-    #             vehicle_color = self.detect_vehicle_color(rgb_image, inst_mask) if rgb_image is not None else "unknown"
-    #
-    #             # Get model predictions if models are loaded
-    #             pred_type, pred_color = {}, {}
-    #             if rgb_image is not None and self.models_loaded:
-    #                 pred_type, pred_color = self.predict_with_models(rgb_image, inst_mask)
-    #
-    #             # print(pred_type, pred_color)
-    #
-    #             # Add to instance info
-    #             instances.append({
-    #                 'class_id': mapped_class,
-    #                 'instance_id': inst_id,
-    #                 'mask': inst_mask,
-    #                 'bbox': (x, y, w, h),
-    #                 'centroid': (cx, cy),
-    #                 'area': area,
-    #                 'frame_idx': frame_idx,
-    #                 'type': vehicle_type,
-    #                 'color': vehicle_color,
-    #                 'pred_type': pred_type,
-    #                 'pred_color': pred_color
-    #             })
-    #         else:
-    #             instances.append({
-    #                 'class_id': mapped_class,
-    #                 'instance_id': inst_id,
-    #                 'mask': inst_mask,
-    #                 'bbox': (x, y, w, h),
-    #                 'centroid': (cx, cy),
-    #                 'area': area,
-    #                 'frame_idx': frame_idx,
-    #                 'type': 'NA',
-    #                 'color': 'NA',
-    #                 'pred_type': 'NA',
-    #                 'pred_color': 'NA'
-    #             })
-    #
-    #     # print(instances)
-    #
-    #     return instances
 
     def extract_instances(self, class_mask, instance_id, frame_idx, rgb_image=None):
         """Extract instance information from masks"""
@@ -910,31 +814,7 @@ class InstanceTracker:
                                     prev_mask, flow_data, track_info['class_id']
                                 )
 
-                                # new_x, new_y = new_points[:, 0], new_points[:, 1]
-
-                                # For each point in the previous mask, find where it moved to
-                                # y_indices, x_indices = np.where(prev_mask)
-                                # if len(y_indices) > 0:
-                                #     # Sample points to avoid processing every pixel
-                                #     sample_indices = np.linspace(0, len(y_indices) - 1, min(100, len(y_indices)),
-                                #                                  dtype=int)
-                                #     sampled_points = [(x_indices[i], y_indices[i]) for i in sample_indices]
-                                #
-                                #     # Find flow for each sampled point
-                                #     new_points = []
-                                #     for x, y in sampled_points:
-                                #         # Find closest point in flow data
-                                #         flow_y, flow_x = y // 10, x // 10  # Adjust based on your flow data sampling
-                                #
-                                #         if 0 <= flow_y < flow_data.shape[0] and 0 <= flow_x < flow_data.shape[1]:
-                                #             # Get the corresponding point in the current frame
-                                #             new_pos = flow_data[flow_y, flow_x, 4:6]
-                                #             new_x, new_y = int(round(new_pos[0])), int(round(new_pos[1]))
-                                #
-                                #             if 0 <= new_y < new_mask.shape[0] and 0 <= new_x < new_mask.shape[1]:
-                                #                 new_points.append((new_x, new_y))
-
-                                    # Update the bbox based on the new points
+                                # Update the bbox based on the new points
                                 if new_points.shape[0] > 0:
                                     new_x_coords, new_y_coords = zip(*new_points)
                                     min_x, max_x = min(new_x_coords), max(new_x_coords)
@@ -1048,47 +928,7 @@ class InstanceTracker:
                                 })
 
         return dummy_instances
-        # for track_id, track_info in self.tracks.items():
-        #     if track_id not in all_matched_tracks:
-        #         # Track was not matched in current frame
-        #         latest_frame = max(track_info['frames'].keys())
-        #
-        #         if latest_frame < frame_idx:
-        #             # This track was not updated in current frame
-        #             if latest_frame == frame_idx - 1:
-        #                 # It was active in the previous frame
-        #                 prev_frame_data = track_info['frames'][latest_frame]
-        #                 lost_count = prev_frame_data.get('lost_count', 0) + 1
-        #
-        #                 if lost_count <= self.max_lost_frames:
-        #                     # Not lost for too long, propagate it
-        #                     # We could use flow here to predict, but simplifying to just keep last position
-        #                     # print(prev_frame_data)
-        #                     track_info['frames'][frame_idx] = {
-        #                         'bbox': prev_frame_data['bbox'],
-        #                         'centroid': prev_frame_data['centroid'],
-        #                         'mask': prev_frame_data['mask'],
-        #                         '3d_cord': prev_frame_data.get('3d_cord'),
-        #                         'depth_centroid': prev_frame_data.get('depth_centroid'),
-        #                         'lost_count': lost_count,
-        #                         'type': prev_frame_data.get('type'),
-        #                         'color': prev_frame_data.get('color'),
-        #                         'pred_type': prev_frame_data.get('pred_type', {}),
-        #                         'pred_color': prev_frame_data.get('pred_color', {}),
-        #                         'area': prev_frame_data.get('area', 0)
-        #                     }
 
-    # def get_depth_at_point(self, y, x, frame_idx, depth_map_paths):
-    #     """Get depth value at a specific pixel location"""
-    #     # This function would need to be implemented to access the depth maps
-    #     # For example, you might have stored depth maps or have a way to load them
-    #     # Return depth value or None if not available
-    #
-    #     # Example implementation if depth maps are available:
-    #     depth_map = self.load_depth(depth_map_paths[frame_idx])
-    #     return depth_map[y, x] if 0 <= y < depth_map.shape[0] and 0 <= x < depth_map.shape[1] else None
-    #     # return None  # Placeholder
-    #
     def pixel_to_3d(self, x, y, depth):
         """Convert pixel coordinates and depth to 3D world coordinates"""
         # Using the camera intrinsics
@@ -1096,27 +936,6 @@ class InstanceTracker:
         y_3d = (y - CY_DEPTH) * depth / FY_DEPTH
         z_3d = depth
         return [x_3d, y_3d, z_3d]
-    #
-    # def find_corresponding_point(self, point_x, point_y, flow_data):
-    #     """Find where a point from frame 1 moved to in frame 2 using flow data"""
-    #     if flow_data is None or len(flow_data) == 0:
-    #         return None
-    #
-    #     # Find the closest point in the flow data
-    #     distances = np.sqrt((flow_data[:, 0] - point_x) ** 2 + (flow_data[:, 1] - point_y) ** 2)
-    #     closest_idx = np.argmin(distances)
-    #
-    #     # Get the corresponding location in frame 2
-    #     # flow_data format: [x1, y1, x1_pred, y1_pred, x2, y2, visibility]
-    #     corresponding_point = [int(flow_data[closest_idx, 4]), int(flow_data[closest_idx, 5])]
-    #
-    #     return corresponding_point
-    #
-    # def get_flow_data(self, frame_idx, next_frame_idx, flow_map_paths):
-    #     flow_file = flow_map_paths[frame_idx]
-    #     flow_data = self.load_flow(flow_file)
-    #     return flow_data
-    #
 
     def compute_object_displacement(self, frame_idx, next_frame_idx, vid_name, keypoints_dir=None):
         """
