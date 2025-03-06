@@ -11,6 +11,8 @@ import aima.utils
 import aima.logic
 from natsort import natsorted
 from tqdm import tqdm
+import multiprocessing
+from functools import partial
 
 # Label dictionary mapping class IDs to names
 LABELS_DICT = {
@@ -39,33 +41,6 @@ LABELS_DICT = {
     22: {'name': 'terrain', 'color': (145, 170, 100), 'train_id': 22, 'id': 20}
 }
 
-# LABELS_DICT = {
-#     0: {'name': 'unlabeled', 'color': (0, 0, 0), 'train_id': 0, 'id': 255},
-#     1: {'name': 'buildings', 'color': (70, 70, 70), 'train_id': 1, 'id': 0},
-#     2: {'name': 'fences', 'color': (100, 40, 40), 'train_id': 2, 'id': 1},
-#     3: {'name': 'other', 'color': (55, 90, 80), 'train_id': 3, 'id': 255},
-#     4: {'name': 'pedestrians', 'color': (220, 20, 60), 'train_id': 4, 'id': 2},
-#     5: {'name': 'poles', 'color': (153, 153, 153), 'train_id': 5, 'id': 3},
-#     6: {'name': 'roadlines', 'color': (157, 234, 50), 'train_id': 6, 'id': 4},
-#     7: {'name': 'roads', 'color': (128, 64, 128), 'train_id': 7, 'id': 5},
-#     8: {'name': 'sidewalks', 'color': (244, 35, 232), 'train_id': 8, 'id': 6},
-#     9: {'name': 'vegetation', 'color': (107, 142, 35), 'train_id': 9, 'id': 7},
-#     10: {'name': 'vehicles', 'color': (0, 0, 142), 'train_id': 10, 'id': 8},
-#     11: {'name': 'walls', 'color': (102, 102, 156), 'train_id': 11, 'id': 9},
-#     12: {'name': 'trafficsigns', 'color': (220, 220, 0), 'train_id': 12, 'id': 10},
-#     13: {'name': 'sky', 'color': (70, 130, 180), 'train_id': 13, 'id': 11},
-#     14: {'name': 'ground', 'color': (81, 0, 81), 'train_id': 14, 'id': 12},
-#     15: {'name': 'bridges', 'color': (150, 100, 100), 'train_id': 15, 'id': 13},
-#     16: {'name': 'railtracks', 'color': (230, 150, 140), 'train_id': 16, 'id': 14},
-#     17: {'name': 'guardrails', 'color': (180, 165, 180), 'train_id': 17, 'id': 15},
-#     18: {'name': 'trafficlights', 'color': (250, 170, 30), 'train_id': 18, 'id': 16},
-#     19: {'name': 'static', 'color': (110, 190, 160), 'train_id': 19, 'id': 17},
-#     20: {'name': 'dynamic', 'color': (170, 120, 50), 'train_id': 20, 'id': 18},
-#     21: {'name': 'water', 'color': (45, 60, 150), 'train_id': 21, 'id': 19},
-#     22: {'name': 'terrain', 'color': (145, 170, 100), 'train_id': 22, 'id': 20}
-# }
-
-# Mapping specific vehicle types to their corresponding FOL predicates
 DATASET = 'CARLA'
 VEHICLE_TYPE_MAPPING = {
     'car': 'Car',
@@ -77,9 +52,9 @@ VEHICLE_TYPE_MAPPING = {
 
 # Constants for position determination
 DISTANCE_THRESHOLD = 50  # Z distance threshold for Near/Far
-SPEED_THRESHOLD_VEHICLE = 0.5  # Threshold for Moving/NotMoving for vehicles
-SPEED_THRESHOLD_PEDESTRIAN = 0.1  # Threshold for Moving/NotMoving for pedestrians
-VEL_SLOPE_THRESHOLD = 0.3  # Threshold for SpeedUp/SpeedDown
+SPEED_THRESHOLD_VEHICLE = 0.7  # Threshold for Moving/NotMoving for vehicles
+SPEED_THRESHOLD_PEDESTRIAN = 0.3  # Threshold for Moving/NotMoving for pedestrians
+VEL_SLOPE_THRESHOLD = 0.5  # Threshold for SpeedUp/SpeedDown
 DIST_SLOPE_THRESHOLD = 0.5  # Threshold for DistanceIncrease/DistanceDecrease
 VERY_CLOSE_DISTANCE = 0.3  # Threshold for TooClose predicate
 ZERO_DISTANCE_THRESHOLD = 0.1  # Threshold for DistanceZeroStart/DistanceZeroEnd
@@ -157,10 +132,8 @@ def get_objects_in_window(track_data, window_frames):
 
     for class_name, class_data in track_data.items():
         for track_id, track_info in class_data.items():
-            # Create object ID based on class and track ID
             object_id = f"{class_name.capitalize()}_{track_id}"
 
-            # Find frames for this object within the window
             object_frames = []
             all_frames = []
             for frame_num, frame_data in track_info.items():
@@ -182,7 +155,7 @@ def get_objects_in_window(track_data, window_frames):
 
 def get_position_category(x, z, max_x, max_z=None):
     """
-    Determine position category based on x and z coordinates
+    Determine position based on x and z coordinates
 
     Args:
         x: X coordinate (horizontal position)
@@ -196,11 +169,8 @@ def get_position_category(x, z, max_x, max_z=None):
         - z_position is 'near' or 'far'
     """
     # Normalize x coordinate to [0, 1]
-    # print(x, max_x)
-    if max_x > 0:
-        norm_x = x / max_x
-    else:
-        norm_x = 0.5
+
+    norm_x = x / max_x
 
     # Determine horizontal position
     if norm_x < 0.4:
@@ -465,7 +435,7 @@ def build_kb_for_window(track_data, window_start, window_size=10, rules_file=Non
             if first_coords and last_coords:
                 # Determine positions
                 if DATASET == 'KITTI':
-                    max_x = 1242  # Assuming image width
+                    max_x = 1242  # image width
                 else:
                     max_x = 480
 
@@ -770,24 +740,55 @@ def process_video(video_name, tracker_dir, output_dir, rules_file=None, window_s
             # print(f"Saved KB for window {window_start} to {window_start + window_size - 1}")
 
 
+def process_video_parallel(args):
+    """Wrapper function for process_video to use with multiprocessing"""
+    video_name, tracker_dir, output_dir, rules_file, window_size = args
+    process_video(video_name, tracker_dir, output_dir, rules_file, window_size)
+    return f"Completed processing {video_name}"
+
+
 def main():
+    global DATASET
+
     parser = argparse.ArgumentParser(description="Convert tracker data to First-Order Logic Knowledge Base")
     parser.add_argument("--tracker_dir", required=True, help="Directory containing tracker data")
     parser.add_argument("--output_dir", required=True, help="Directory to save output files")
     parser.add_argument("--rules_file", help="Path to file containing implication rules")
+    parser.add_argument("--dataset", help="Name of the Dataset")
     parser.add_argument("--window_size", type=int, default=10, help="Window size in frames")
+    parser.add_argument("--num_processes", type=int, default=8,
+                        help="Number of processes to use (default: number of CPU cores)")
 
     args = parser.parse_args()
+
+    DATASET = args.dataset.upper()
 
     # Create output directory
     os.makedirs(args.output_dir, exist_ok=True)
 
     video_list = [vid for vid in os.listdir(args.tracker_dir) if os.path.isdir(os.path.join(args.tracker_dir, vid))]
-    video_list = natsorted(video_list)[15:16]  # [:1]  # [1:2]
+    video_list = natsorted(video_list)  # [10:]  # [16:]  # [15:16]  # [:1]  # [1:2]
     # print(video_list)
 
-    for video_name in tqdm(video_list):
-        process_video(video_name, args.tracker_dir, args.output_dir, args.rules_file, args.window_size)
+    # for video_name in tqdm(video_list):
+    #     process_video(video_name, args.tracker_dir, args.output_dir, args.rules_file, args.window_size)
+
+    num_processes = args.num_processes or multiprocessing.cpu_count()
+    print(f"Using {num_processes} processes for parallel processing")
+
+    # Prepare arguments for each video
+    process_args = []
+    for video_name in video_list:
+        process_args.append((video_name, args.tracker_dir, args.output_dir, args.rules_file,
+                             args.window_size))
+
+    # Process videos in parallel
+    with multiprocessing.Pool(processes=num_processes) as pool:
+        results = pool.map(process_video_parallel, process_args)
+
+    # Print results
+    for result in results:
+        print(result)
 
 
 if __name__ == "__main__":

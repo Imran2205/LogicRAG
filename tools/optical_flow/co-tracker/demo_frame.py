@@ -26,7 +26,9 @@ def load_frames_from_folder(folder_path):
         files.extend(glob.glob(os.path.join(folder_path, ext)))
 
     # Sort files by name
-    files = sorted(files)
+    files = natsorted(files)
+
+    # print(files)
 
     if not files:
         raise ValueError(f"No image files found in {folder_path}")
@@ -50,7 +52,7 @@ def load_frames_from_folder(folder_path):
     return frames
 
 
-def process_folder(folder_path, output_dir, model, device, sample_interval=5):
+def process_folder(folder_path, output_dir, model, device, dataset, sample_interval=5):
     """
     Process all consecutive frame pairs in a folder and output dense flow fields.
     Uses a sampled grid with specified interval between points to reduce memory usage.
@@ -120,7 +122,11 @@ def process_folder(folder_path, output_dir, model, device, sample_interval=5):
         ])
 
         # Save as numpy array
-        output_path = os.path.join(folder_output_dir, f"flow-{folder_name}_{i + 1:05d}.npy")
+        if dataset == 'KITTI':
+            output_path = os.path.join(folder_output_dir, f"flow-{folder_name}_{i + 1:06d}.npy")
+        elif dataset == 'CARLA':
+            output_path = os.path.join(folder_output_dir, f"flow-{folder_name}_{i + 2:05d}.npy")
+
         np.save(output_path, output_array)
 
     print(f"Completed processing {folder_path}")
@@ -143,6 +149,11 @@ if __name__ == "__main__":
         "--checkpoint",
         default=None,
         help="CoTracker model parameters (optional)",
+    )
+    parser.add_argument(
+        "--dataset",
+        default='CARLA',
+        help="Name of the dataset",
     )
     parser.add_argument(
         "--use_v2_model",
@@ -196,7 +207,8 @@ if __name__ == "__main__":
     # Process each subfolder
     total_processed_pairs = 0
     for folder in subfolders:
-        pairs_processed = process_folder(folder, args.output_dir, model, DEFAULT_DEVICE, args.sample_interval)
+        pairs_processed = process_folder(folder, args.output_dir, model, DEFAULT_DEVICE,
+                                         dataset=args.dataset, sample_interval=args.sample_interval)
         total_processed_pairs += pairs_processed
 
     print(f"Total processed {total_processed_pairs} frame pairs across {len(subfolders)} folders")

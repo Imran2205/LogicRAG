@@ -14,22 +14,30 @@ import torch
 import multiprocessing
 from functools import partial
 
-DATASET = 'CARLA'
+DATASET = 'KITTI'
+FX_DEPTH = 721.5377
+CX_DEPTH = 609.5593
+FY_DEPTH = 721.5377
+CY_DEPTH = 172.854
+SCALE = 256.0
 
-if DATASET == 'KITTI':
-    # Camera intrinsics for KITTI
-    FX_DEPTH = 721.5377
-    CX_DEPTH = 609.5593
-    FY_DEPTH = 721.5377
-    CY_DEPTH = 172.854
-    SCALE = 256.0
-elif DATASET == 'CARLA':
-    # Camera intrinsics for CARLA
-    FX_DEPTH = 168.05
-    FY_DEPTH = 168.05
-    CX_DEPTH = 480/2
-    CY_DEPTH = 270/2
-    SCALE = 65.536
+
+def set_camera_intrinsic():
+    global FX_DEPTH, CX_DEPTH, FY_DEPTH, CY_DEPTH, SCALE
+    if DATASET == 'KITTI':
+        # Camera intrinsics for KITTI
+        FX_DEPTH = 721.5377
+        CX_DEPTH = 609.5593
+        FY_DEPTH = 721.5377
+        CY_DEPTH = 172.854
+        SCALE = 256.0
+    elif DATASET == 'CARLA':
+        # Camera intrinsics for CARLA
+        FX_DEPTH = 168.05
+        FY_DEPTH = 168.05
+        CX_DEPTH = 480/2
+        CY_DEPTH = 270/2
+        SCALE = 65.536
 
 
 # Define label mapping from Cityscapes to our custom mapping
@@ -259,10 +267,10 @@ class InstanceTracker:
 
             # Further refine the crop by applying the mask
             mask_crop = instance_mask[y_min:y_max, x_min:x_max]
-            vehicle_crop[~mask_crop] = [0, 0, 0]  # Set background to black
+            # vehicle_crop[~mask_crop] = [0, 0, 0]  # Set background to black
 
             # Convert to PIL Image
-            vehicle_crop = cv2.cvtColor(vehicle_crop, cv2.COLOR_RGB2BGR)
+            # vehicle_crop = cv2.cvtColor(vehicle_crop, cv2.COLOR_RGB2BGR)
             pil_image = Image.fromarray(vehicle_crop)
 
             # Apply transformations and add batch dimension
@@ -422,6 +430,8 @@ class InstanceTracker:
                         pred_type, pred_color = {}, {}
                         if rgb_image is not None and self.models_loaded:
                             pred_type, pred_color = self.predict_with_models(rgb_image, contour_mask)
+
+                        # print(vehicle_color, vehicle_type, pred_type, pred_color)
 
                         instances.append({
                             'class_id': mapped_class,
@@ -1197,7 +1207,7 @@ class InstanceTracker:
         normal_frequent_path = os.path.join(output_dir, f"normal_vehicle_info_frequent_{video_name}.txt")
 
         # New combined results file
-        combined_info_path = os.path.join(output_dir, f"combined_vehicle_info_{video_name}.txt")
+        combined_info_path = os.path.join(output_dir, f"vehicles_prop.txt")
 
         with open(vehicle_info_path, 'w') as f_normal, open(model_info_path, 'w') as f_model, \
                 open(model_info_path_best, 'w') as f_model_best, open(model_frequent_path, 'w') as f_model_freq, \
@@ -1347,9 +1357,16 @@ class InstanceTracker:
                     f_normal_freq.write(f"ColorOf(Vehicles_{track_id}, {most_frequent_normal_color})\n")
 
                     # Write to combined file
-                    f_combined.write(f"TypeOf(Vehicles_{track_id}, {most_common_model_type})\n")
-                    f_combined.write(f"TypeOf(Vehicles_{track_id}, {normal_type_combined})\n")
-                    f_combined.write(f"ColorOf(Vehicles_{track_id}, {most_common_color})\n")
+                    f_combined.write(f"TypeOf(Vehicles_{track_id}, {best_type})\n")
+                    f_combined.write(f"ColorOf(Vehicles_{track_id}, {best_color})\n")
+                    f_combined.write(f"TypeOf(Vehicles_{track_id}, {model_type})\n")
+                    f_combined.write(f"ColorOf(Vehicles_{track_id}, {model_color})\n")
+                    f_combined.write(f"TypeOf(Vehicles_{track_id}, {model_best_type})\n")
+                    f_combined.write(f"ColorOf(Vehicles_{track_id}, {model_best_color})\n")
+                    f_combined.write(f"TypeOf(Vehicles_{track_id}, {most_frequent_model_type})\n")
+                    f_combined.write(f"ColorOf(Vehicles_{track_id}, {most_frequent_model_color})\n")
+                    f_combined.write(f"TypeOf(Vehicles_{track_id}, {most_frequent_normal_type})\n")
+                    f_combined.write(f"ColorOf(Vehicles_{track_id}, {most_frequent_normal_color})\n")
 
         print(f"Saved vehicle type and color information to {vehicle_info_path}")
         print(f"Saved model-based vehicle type and color information to {model_info_path}")
@@ -1413,7 +1430,7 @@ def process_video(video_dir, output_dir, video_name, rgb_base_dir=None, type_mod
         max_lost_frames=5,
         flow_weight=0.75,
         iou_threshold=0.1,
-        min_obj_size=20,
+        min_obj_size=10,
         type_model_path=type_model_path,
         color_model_path=color_model_path
     )
@@ -1461,13 +1478,14 @@ def process_video(video_dir, output_dir, video_name, rgb_base_dir=None, type_mod
             if DATASET == 'KITTI':
                 rgb_file = os.path.join(rgb_dir, f"{frame_num:06d}.png")
             else:
-                rgb_file = os.path.join(rgb_dir, f"{frame_num:05d}.png")
+                rgb_file = os.path.join(rgb_dir, 'rgb', f"{video_name}_{frame_num:05d}.png")
             if os.path.exists(rgb_file):
-                rgb_image = np.array(Image.open(rgb_file))
+                rgb_image = np.array(Image.open(rgb_file).convert('RGB'))
                 # rgb_image = cv2.cvtColor(rgb_image, cv2.COLOR_BGR2RGB)
 
         # Extract instances from the current frame
         # curr_instances = tracker.extract_instances(class_mask, instance_id, frame_num)
+        # print(rgb_file)
         curr_instances = tracker.extract_instances(class_mask, instance_id, frame_num, rgb_image)
 
         # Track instances
@@ -1540,6 +1558,7 @@ def process_video_parallel(args):
 
 
 def main():
+    global DATASET
     import argparse
 
     parser = argparse.ArgumentParser(description="Track instances in panoptic segmentation using flow and depth")
@@ -1549,16 +1568,23 @@ def main():
                         help="Base directory for RGB images")
     parser.add_argument("--type_model_path", default=None, help="Path to vehicle type model")
     parser.add_argument("--color_model_path", default=None, help="Path to vehicle color model")
-    parser.add_argument("--num_processes", type=int, default=None,
+    parser.add_argument("--num_processes", type=int, default=8,
                         help="Number of processes to use (default: number of CPU cores)")
+    parser.add_argument("--dataset", default='CARLA', help="NAme of the dataset")
 
     args = parser.parse_args()
+
+    DATASET = args.dataset.upper()
+
+    set_camera_intrinsic()
+
+    print(f'Using camera intrinsic of {DATASET}: \n\t Focal: ({FX_DEPTH}, {FY_DEPTH}) \n\t Center: ({CX_DEPTH}, {CY_DEPTH}) \n\t Scale: {SCALE}')
 
     # Create output directory
     os.makedirs(args.output_dir, exist_ok=True)
 
     # Find all video directories
-    video_dirs = natsorted([f.path for f in os.scandir(args.parent_dir) if f.is_dir()])[15:]  # [5:]  # [20:]
+    video_dirs = natsorted([f.path for f in os.scandir(args.parent_dir) if f.is_dir()])  # [16:]  # [5:]  # [20:]
 
     # print(video_dirs)
 
