@@ -60,6 +60,7 @@ functions:
   TypeOf:
     predicate: TypeOf(x, type)
     values:
+      - Car
       - Cab
       - Convertible
       - Coupe
