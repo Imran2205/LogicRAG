@@ -102,3 +102,4 @@ Can you spot a White Car in the front?,"TypeOf(x, Car)^ColorOf(x, White)^Initial
 Is there a White Car on the right of the scene?,"TypeOf(x, Car)^ColorOf(x, White)^InitialLocation(x, Right)"
 Does the distance between the White Car on the left and the Red Car on the left increase?,"TypeOf(x, Car)^ColorOf(x, White)^InitialLocation(x, Left)^TypeOf(y, Car)^ColorOf(y, Red)^InitialLocation(y, Left)^GoAway(x, y)"
 Does the distance between the White Car on the left and the Red Car on the left decrease?,"TypeOf(x, Car)^ColorOf(x, White)^InitialLocation(x, Left)^TypeOf(y, Car)^ColorOf(y, Red)^InitialLocation(y, Left)^DistanceDecrease(x, y)"
+can you spot a White Car in the front of the scene?,"TypeOf(x, Car)^ColorOf(x, White)^InitialLocation(x, Front)"
