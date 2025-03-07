@@ -95,7 +95,7 @@ def generate_answers_gpt4(images, questions, logger, model_name):
     return []
 
 
-def process_questions_csv(csv_path, frames_dir, output_csv_path, log_dir, model_name):
+def get_answers_gpt4(csv_path, frames_dir, output_csv_path, log_dir, model_name):
     # Set up logging
     logger = setup_logging(log_dir, model_name)
     logger.info(f"Starting processing of questions from {csv_path}")
@@ -178,4 +178,4 @@ if __name__ == "__main__":
     # MODEL_NAME = "gpt-4.5-preview" # gpt-4.5-preview-2025-02-27
     # MODEL_NAME = "o1"  # o1-2024-12-17
 
-    process_questions_csv(args.csv, args.frames_dir, args.output, args.log_dir, MODEL_NAME)
+    get_answers_gpt4(args.csv, args.frames_dir, args.output, args.log_dir, MODEL_NAME)

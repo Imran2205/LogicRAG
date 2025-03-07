@@ -1,28 +1,28 @@
 Video,Frame,Questions,Human,claude-3-5-sonnet-20240620,gpt-4o,LogicRAG
 0,000060-000069,Can you spot a pedestrian at the right in the last few frames?,1,1,1,1
 0,000060-000069,Is there a White Car on the right of the frame?,1,1,1,1
-0,000060-000069,Does the distance between the pedestrian and the White Car remains constant?,1,1,1,1
+0,000060-000069,Does the distance between the pedestrian and the White Car remain constant?,1,1,1,1
 0,000060-000069,Is there a Black Car on the left the scene?,1,1,1,1
 0,000060-000069,Does the Black Car disappear from the scene?,1,0,0,1
 0,000060-000069,Is there a Black Car on the left of the scene?,1,1,1,1
 0,000060-000069,Is there a White Car on the left of the scene?,1,0,0,1
 0,000180-000189,Is there a Black Car on the left of the scene?,1,1,1,1
 0,000180-000189,Is the Black Car stopped?,1,1,1,1
-0,000180-000189,Can you spot a Black Car on the left that disappear from the scene?,1,0,0,1
+0,000180-000189,Can you spot a Black Car on the left that disappears from the scene?,1,0,0,1
 0,000180-000189,Is there a Black Car on the right?,1,1,1,1
-0,000180-000189,Does the distance between the Black Car on the left and the Black Car on the right remains the same?,1,1,1,1
+0,000180-000189,Does the distance between the Black Car on the left and the Black Car on the right remain the same?,1,1,1,1
 0,000450-000459,Is there a Black Car near the left that disappears from the scene?,1,0,0,1
 0,000450-000459,Can you spot a trafficsign near the left?,1,1,1,0
 0,000450-000459,Can you spot a pole in the front that shifts to the right at the  last few frames?,1,1,1,1
 0,000450-000459,Can you spot a White Car near the right?,1,1,1,1
 0,000450-000459,Can you spot a Black Car in the front?,1,1,1,1
-0,000450-000459,Does the distance between the White Car on the right and the Black Car in the front remains the same?,1,1,1,1
+0,000450-000459,Does the distance between the White Car on the right and the Black Car in the front remain the same?,1,1,1,1
 0,000450-000459,Is the White Car on the right stopped?,1,1,1,1
 1,000000-000009,Is there a Black Car in the front in the initial frames that moves to the right?,1,0,1,1
 1,000000-000009,Does the Black Car move at a constant speed?,1,0,1,1
 1,000000-000009,Can you spot a White Car on the left of the scene?,1,1,1,1
 1,000000-000009,Does the White Car on the left move at a constant speed?,1,0,1,1
-1,000000-000009,Does the distance between the Black Car and the White Car remains the same?,1,0,0,1
+1,000000-000009,Does the distance between the Black Car and the White Car remain the same?,1,0,0,1
 1,000000-000009,Can you spot a trafficsign near the left?,1,1,1,0
 1,000000-000009,Can you spot a trafficlight near the left?,1,1,0,1
 1,000000-000009,Can you spot a pedestrian on the left?,1,0,1,1
@@ -46,7 +46,7 @@ Video,Frame,Questions,Human,claude-3-5-sonnet-20240620,gpt-4o,LogicRAG
 2,000010-000019,Are there vehicles on the right of the scene?,1,1,1,1
 2,000010-000019,Are there any poles on the left?,1,1,1,1
 2,000040-000049,Are there any vehicles on the right?,1,1,0,1
-2,000040-000049,Is there any White Car that disappear from the left of scene?,1,0,0,1
+2,000040-000049,Is there any White Car that disappears from the left of the scene?,1,0,0,1
 2,000040-000049,Is there any Orange Car on the left of the scene?,1,0,0,1
 2,000040-000049,Can you spot a Black Car moving at constant speed on the left of the scene?,1,1,1,1
 2,000040-000049,Is there a pedestrian on the left of the scene?,1,0,1,1
@@ -65,13 +65,13 @@ Video,Frame,Questions,Human,claude-3-5-sonnet-20240620,gpt-4o,LogicRAG
 3,000190-000199,Does the distance between the person and the Black Car on the left increase?,1,1,1,1
 3,000190-000199,Does the Black Car on the left move?,0,0,0,0
 4,000000-000009,Is there a Black Coupe near the left?,1,1,1,1
-4,000000-000009,Doest the Black Coupe disappear from the left of the scene?,1,1,1,1
+4,000000-000009,Does the Black Coupe disappear from the left of the scene?,1,1,1,1
 4,000000-000009,Is there a White Van at the front?,1,1,1,1
 4,000000-000009,Is the White Van at the front stopped?,0,0,1,1
 4,000000-000009,Does the White Van at the front move at a constant speed?,1,1,1,1
 4,000000-000009,Does the distance between Black Coupe on the left and the White Van in the front decrease?,0,1,1,0
 4,000140-000149,Can you spot a Gray Hatchback at the front?,1,1,1,1
-4,000140-000149,Does the Gray Hatchback that is at the front shifts to the near left corner of the scene?,1,1,0,1
+4,000140-000149,Does the Gray Hatchback that is at the front shift to the near left corner of the scene?,1,1,0,1
 4,000140-000149,Is there any White Van at the front?,1,1,1,1
 4,000140-000149,Does the White Van in the front accelerate?,0,0,0,0
 4,000140-000149,Does the Gray Hatchback move at a constant speed?,1,0,1,1
@@ -86,12 +86,12 @@ Video,Frame,Questions,Human,claude-3-5-sonnet-20240620,gpt-4o,LogicRAG
 8,000000-000009,Does the Black Wagon on the right move at a constant speed?,1,1,1,1
 8,000000-000009,Does a pedestrian appear on the right of the scene?,1,1,1,1
 8,000140-000149,Is there a Blue Van on the left of the scene?,1,1,1,1
-8,000140-000149,Does the speed of the Blue Van remains unchanged?,1,0,1,1
+8,000140-000149,Does the speed of the Blue Van remain unchanged?,1,0,1,1
 8,000140-000149,can you spot a White Car in the front of the scene?,1,1,1,1
-8,000140-000149,Does the position of the White car changes from front to left?,1,0,1,1
+8,000140-000149,Does the position of the White car change from front to left?,1,0,1,1
 8,000140-000149,Does the speed of the White Car remain unchanged?,1,0,1,1
 8,000140-000149,Is there a Black Wagon in the front?,1,0,0,1
-8,000140-000149,Does speed of the Black Wagon in the front remains unchanged?,1,0,0,1
+8,000140-000149,Does the speed of the Black Wagon in the front remain unchanged?,1,0,0,1
 8,000140-000149,Does the distance between Black Wagon in the front and the Blue Van on the left increase?,1,1,0,1
 10,000000-000009,Is there a Red Car in the front that moves to the right of the scene?,1,1,1,0
 10,000000-000009,Is there a White Car on the left of the scene?,1,1,1,1

@@ -3,7 +3,7 @@ import logging
 from utils.inference_engine import query_kb
 
 
-def process_video_sequences(
+def lrag_inference(
         questions_csv_path,
         fol_mapping_csv_path,
         base_kb_path,
@@ -115,7 +115,7 @@ if __name__ == "__main__":
     all_annotations = []
 
     for v_id in vid_ids:
-        ans, annos = process_video_sequences(
+        ans, annos = lrag_inference(
             args.csv, args.fol_trans_csv,
             args.kb_dir, args.tracker_dir,
             v_id.strip(), dataset=args.dataset,

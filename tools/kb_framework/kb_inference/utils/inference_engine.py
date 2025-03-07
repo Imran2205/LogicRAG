@@ -4,10 +4,6 @@ import logging
 import time
 from typing import List, Dict, Set
 import re
-from tqdm import tqdm
-import numpy as np
-from sklearn.metrics import f1_score, precision_score, recall_score, classification_report
-import pandas as pd
 
 
 class KanrenKB:

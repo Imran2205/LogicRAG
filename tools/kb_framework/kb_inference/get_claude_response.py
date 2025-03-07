@@ -86,7 +86,7 @@ def generate_answers(images, questions, client, logger, model_name):
     return []
 
 
-def process_questions_csv(csv_path, frames_dir, output_csv_path, log_dir, model_name):
+def get_answers_claude3(csv_path, frames_dir, output_csv_path, log_dir, model_name):
     """Process all questions in the CSV file"""
     # Set up logging
     logger = setup_logging(log_dir, model_name)
@@ -176,4 +176,4 @@ if __name__ == "__main__":
     # MODEL_NAME = "claude-3-5-sonnet-20241022"
     # MODEL_NAME = "claude-3-7-sonnet-20250219"
 
-    process_questions_csv(args.csv, args.frames_dir, args.output, args.log_dir, MODEL_NAME)
+    get_answers_claude3(args.csv, args.frames_dir, args.output, args.log_dir, MODEL_NAME)
