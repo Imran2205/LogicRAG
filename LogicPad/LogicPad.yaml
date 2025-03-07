@@ -1,0 +1,183 @@
+atomic_predicates:
+  semantic_segmentation:
+    - Road(x)
+    - LaneMarking(x)
+    - TrafficSign(x)
+    - Sidewalk(x)
+    - Fence(x)
+    - Pole(x)
+    - Wall(x)
+    - Building(x)
+    - Vegetation(x)
+    - Vehicle(x)
+    - Pedestrian(x)
+    - Terrain(x)
+    - Bridge(x)
+    - Guardrail(x)
+    - RailTrack(x)
+    - Trafficlight(x)
+    - ConstructionObj(x)
+
+  tracker:
+    - Appears(x)
+    - Disappears(x)
+    - Moving(x)
+    - NotMoving(x)
+    - SpeedUp(x)
+    - SpeedDown(x)
+    - NotSpeedUp(x)
+    - NotSpeedDown(x)
+    - CloseToCamera(x)
+    - AtRight(x)
+    - AtLeft(x)
+    - AtCenter(x)
+    - DistanceIncreases(x, y)
+    - DistanceDecreases(x, y)
+    - DistanceDecreasesToZero(x, y)
+    - DistanceZeroEnd(x, y)
+    - DistanceZeroStart(x, y)
+    - NotDistanceDecrease(x, y)
+    - NotDistanceIncrease(x, y)
+    - On(x, y)
+
+functions:
+  ColorOf:
+    predicate: ColorOf(x, color)
+    values:
+      - Black
+      - Blue
+      - Brown
+      - Cyan
+      - Green
+      - Grey
+      - Orange
+      - Red
+      - Violet
+      - White
+      - Yellow
+      - Other
+
+  TypeOf:
+    predicate: TypeOf(x, type)
+    values:
+      - Cab
+      - Convertible
+      - Coupe
+      - Hatchback
+      - Minivan
+      - Other
+      - SUV
+      - Sedan
+      - Van
+      - Wagon
+
+  location:
+    InitialLocation:
+      predicate: InitialLocation(x, location)
+      values:
+        - Left
+        - Right
+        - Front
+        - NearLeft
+        - FarLeft
+        - NearRight
+        - FarRight
+        - NearFront
+        - FarFront
+
+    LastLocation:
+      predicate: LastLocation(x, location)
+      values:
+        - Left
+        - Right
+        - Front
+        - NearLeft
+        - FarLeft
+        - NearRight
+        - FarRight
+        - NearFront
+        - FarFront
+
+derived_predicates:
+  - name: Stopped
+    logic: "∀x : (¬Moves(x)) → Stopped(x)"
+
+  - name: Walk
+    logic: "∀x : (Pedestrian(x) ∧ Moves(x)) → Walk(x)"
+
+  - name: Stand
+    logic: "∀x : (Pedestrian(x) ∧ ¬Moves(x)) → Stand(x)"
+
+  - name: Accelerate
+    logic: "∀x : (Vehicle(x) ∧ SpeedUp(x)) → Accelerate(x)"
+
+  - name: Decelerate
+    logic: "∀x : (Vehicle(x) ∧ SpeedDown(x)) → Decelerate(x)"
+
+  - name: ConstantSpeed
+    logic: "∀x : (Vehicle(x) ∧ ¬SpeedUp(x) ∧ ¬SpeedDown(x)) → ConstantSpeed(x)"
+
+  - name: IncreasePace
+    logic: "∀x : (Pedestrian(x) ∧ SpeedUp(x)) → IncreasePace(x)"
+
+  - name: DecreasePace
+    logic: "∀x : (Pedestrian(x) ∧ SpeedDown(x)) → DecreasePace(x)"
+
+  - name: FixedPace
+    logic: "∀x : (Pedestrian(x) ∧ ¬SpeedUp(x) ∧ ¬SpeedDown(x)) → FixedPace(x)"
+
+  - name: Move
+    logic:
+      - "∀x : (Vehicles(x) ∧ Moving(x)) → Move(x)"
+      - "∀x : (Pedestrian(x) ∧ Moving(x)) → Move(x)"
+
+  - name: GettingCloser
+    logic: "∀x,y : (DistanceDecreases(x, y)) → GettingCloser(x, y)"
+
+  - name: Collide
+    logic: "∀x,y : (DistanceDecreases(x, y) ∧ DistanceDecreasesToZero(x, y)) → Collide(x, y)"
+
+  - name: ComeClose
+    logic: "∀x,y : (DistanceDecrease(x, y)) → ComeClose(x, y)"
+
+  - name: GoAway
+    logic: "∀x,y : (DistanceIncrease(x, y)) → GoAway(x, y)"
+
+  - name: ConstantDistance
+    logic:
+      - "∀x,y : (NotDistanceDecrease(x, y) ∧ NotDistanceIncrease(x, y)) → ConstantDistance(x, y)"
+      - "∀x,y : (¬DistanceDecrease(x, y) ∧ ¬DistanceIncrease(x, y)) → ConstantDistance(x, y)"
+
+  - name: Cross
+    logic: "∀x : (Pedestrian(x) ∧ On(x, y) ∧ Road(y)) → Cross(x)"
+
+  - name: NotCross
+    logic: "∀x : (Pedestrian(x) ∧ On(x, y) ∧ Sidewalk(y)) → NotCross(x)"
+
+  - name: Crash
+    logic: "∀x,y : (DistanceDecrease(x, y) ∧ DistanceZeroEnd(x, y) ∧ ConstructionObj(y) ∧ Vehicles(x)) → Crash(x, y)"
+
+  - name: Merge
+    logic: "∀x,y : (DistanceDecrease(x, y) ∧ DistanceZeroEnd(x, y) ∧ Disappear(x) ∧ Vehicles(y) ∧ Vehicles(x)) → Merge(x, y)"
+
+  - name: Enter
+    logic: "∀x,y : (DistanceDecrease(x, y) ∧ DistanceZeroEnd(x, y) ∧ Disappear(x) ∧ Vehicles(y) ∧ Pedestrian(x)) → Enter(x, y)"
+
+  - name: Diverge
+    logic: "∀x,y : (DistanceIncrease(x, y) ∧ DistanceZeroStart(x, y) ∧ Appear(x) ∧ Vehicles(y) ∧ Vehicles(x)) → Diverge(x, y)"
+
+  - name: Exit
+    logic: "∀x,y : (DistanceIncrease(x, y) ∧ DistanceZeroStart(x, y) ∧ Appear(x) ∧ Vehicles(y) ∧ Pedestrian(x)) → Exit(x, y)"
+
+  - name: Ride
+    logic: "∀x,y : (Pedestrian(x) ∧ Vehicles(y) ∧ TypeOf(y, Motorcycle) ∧ On(x, y)) → Ride(x, y)"
+
+  - name: NotAccelerate
+    logic:
+      - "∀x : (¬SpeedUp(x)) → NotAccelerate(x)"
+      - "∀x : (NotSpeedUp(x)) → NotAccelerate(x)"
+
+  - name: NotDecelerate
+    logic:
+      - "∀x : (¬SpeedDown(x)) → NotDecelerate(x)"
+      - "∀x : (NotSpeedDown(x)) → NotDecelerate(x)"
