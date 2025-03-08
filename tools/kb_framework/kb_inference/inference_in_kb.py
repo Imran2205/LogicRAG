@@ -21,21 +21,14 @@ def lrag_inference(
     questions_df = pd.read_csv(questions_csv_path)
     fol_mapping_df = pd.read_csv(fol_mapping_csv_path)
 
-    # Create a mapping of questions to FOL queries
     fol_dict = dict(zip(fol_mapping_df['Question'], fol_mapping_df['FOL Query']))
 
-    frame_groups = []
-
-    # tot_q = 0
-    # tot_cor = 0
     seq_all_ans = []
     seq_all_annos = []
 
-    # Group by Video and Frame
     groups = questions_df.groupby(['Video', 'Frame'], dropna=False)
 
     # print(frame_groups)
-    # Generate function calls for each frame sequence
     for (vid, frame_range), group in groups:
         video = f"{int(vid):04d}"
 
@@ -43,11 +36,9 @@ def lrag_inference(
 
         questions = group['Questions'].tolist()
         annotations = group['Human'].tolist()
-        # Parse frame range
-        # start_frame, end_frame = map(int, frame_seq.split('-'))
+
         start_frame, end_frame = frame_range.split('-')
 
-        # Generate FOL queries list
         fol_queries = []
         for question in questions:
             if question in fol_dict:
@@ -55,11 +46,9 @@ def lrag_inference(
             else:
                 print(f"Warning: No FOL query found for question: {question}")
 
-        # Generate paths
         kb_file_path = f"{base_kb_path}/{video}/kb_window_{start_frame}_{end_frame}.txt"
         obj_info_file_path = f"{base_tracker_out_path}/{video}/vehicles_prop.txt"
 
-        # Generate and print the function call
         # print(f"\n# Video: {video_id}, Frame sequence: {frame_seq}")
         # print(fol_queries)
 
