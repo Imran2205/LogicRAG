@@ -4,7 +4,11 @@ import requests
 import time
 import ast
 import re
-from utils.baseline_utils import *
+
+try:
+    from .utils.baseline_utils import *
+except ImportError:
+    from utils.baseline_utils import *
 
 
 def generate_answers_gpt4(images, questions, logger, model_name):

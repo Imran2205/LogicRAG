@@ -1,6 +1,11 @@
 import pandas as pd
 import logging
-from utils.inference_engine import query_kb
+try:
+    from .utils.inference_engine import query_kb
+    from .utils.eval_utils import get_scores
+except ImportError:
+    from utils.inference_engine import query_kb
+    from utils.eval_utils import get_scores
 
 
 def lrag_inference(
@@ -8,8 +13,7 @@ def lrag_inference(
         fol_mapping_csv_path,
         base_kb_path,
         base_tracker_out_path,
-        video_id,
-        dataset='KITTI', logger=None):
+        logger=None):
     if not logger:
         logging.basicConfig(level=logging.INFO)
         logger = logging.getLogger(__name__)
@@ -52,8 +56,8 @@ def lrag_inference(
                 print(f"Warning: No FOL query found for question: {question}")
 
         # Generate paths
-        kb_file_path = f"{base_kb_path}/kb_out_{dataset}/{video_id}/kb_window_{start_frame}_{end_frame}.txt"
-        obj_info_file_path = f"{base_tracker_out_path}/track_out_{dataset}/{video_id}/vehicles_prop.txt"
+        kb_file_path = f"{base_kb_path}/{video}/kb_window_{start_frame}_{end_frame}.txt"
+        obj_info_file_path = f"{base_tracker_out_path}/{video}/vehicles_prop.txt"
 
         # Generate and print the function call
         # print(f"\n# Video: {video_id}, Frame sequence: {frame_seq}")
@@ -100,8 +104,6 @@ if __name__ == "__main__":
     parser.add_argument("--fol_trans_csv", required=True, help="Path to input CSV file with FOL translation")
     parser.add_argument("--kb_dir", required=True, help="Directory containing KB files")
     parser.add_argument("--tracker_dir", required=True, help="Directory containing tracker trajectories")
-    parser.add_argument("--vid_ids", required=True, help="Comma seperated video IDs")
-    parser.add_argument("--dataset", required=True, help="Name of the dataset")
     parser.add_argument("--output", required=True, help="Path to output CSV file")
 
     args = parser.parse_args()
@@ -109,22 +111,21 @@ if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
     base_logger = logging.getLogger(__name__)
 
-    vid_ids = args.vid_ids.split(',')  # ['0000', '0001', '0002', '0003', '0004', '0005', '0008', '0010', '0012']
-
-    all_answers = []
-    all_annotations = []
-
-    for v_id in vid_ids:
-        ans, annos = lrag_inference(
-            args.csv, args.fol_trans_csv,
-            args.kb_dir, args.tracker_dir,
-            v_id.strip(), dataset=args.dataset,
-            logger=base_logger
-        )
-
-        all_answers += ans
-        all_annotations += annos
-
     df = pd.read_csv(args.csv)
+    # vid_ids = [str(vid_).zfill(4) for vid_ in list(set(df['Video'].tolist()))]
+    # print(vid_ids)
+
+    # vid_ids = args.vid_ids.split(',')  # ['0000', '0001', '0002', '0003', '0004', '0005', '0008', '0010', '0012']
+
+    all_answers, all_annotations = lrag_inference(
+        args.csv, args.fol_trans_csv,
+        args.kb_dir, args.tracker_dir,
+        logger=base_logger
+    )
+
+    acc, f1, precision, recall = get_scores(all_answers, all_annotations)
+
+    print(f"Overall Accuracy: {acc:.2f}, F1: {f1:.2f}, Prec: {precision:.2f}, Rec: {recall:.2f}")
+
     df['LogicRAG'] = all_answers
     df.to_csv(args.output, index=False)

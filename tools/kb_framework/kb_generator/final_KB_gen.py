@@ -52,7 +52,7 @@ VEHICLE_TYPE_MAPPING = {
 
 # Constants for position determination
 DISTANCE_THRESHOLD = 50  # Z distance threshold for Near/Far
-SPEED_THRESHOLD_VEHICLE = 0.7  # Threshold for Moving/NotMoving for vehicles
+SPEED_THRESHOLD_VEHICLE = 0.7  # 1.0  # Threshold for Moving/NotMoving for vehicles
 SPEED_THRESHOLD_PEDESTRIAN = 0.3  # Threshold for Moving/NotMoving for pedestrians
 VEL_SLOPE_THRESHOLD = 0.5  # Threshold for SpeedUp/SpeedDown
 DIST_SLOPE_THRESHOLD = 0.5  # Threshold for DistanceIncrease/DistanceDecrease

@@ -4,7 +4,11 @@ import anthropic
 import time
 import ast
 import re
-from utils.baseline_utils import *
+
+try:
+    from .utils.baseline_utils import *
+except ImportError:
+    from utils.baseline_utils import *
 
 
 def generate_answers(images, questions, client, logger, model_name):
