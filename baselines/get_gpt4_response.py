@@ -1,4 +1,3 @@
-import os
 import pandas as pd
 import requests
 import time
@@ -6,7 +5,7 @@ import ast
 import re
 
 try:
-    from kb_framework.kb_inference.utils.baseline_utils import *
+    from .utils.baseline_utils import *
 except ImportError:
     from utils.baseline_utils import *
 
