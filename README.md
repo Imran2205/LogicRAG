@@ -8,9 +8,6 @@ Test Logic-RAG on Google Colab: [![Open In Colab](https://colab.research.google.
 
 - Full documentation will be available soon.
 
-**Logic-RAG framework for visual-spatial reasoning:**
-![Logic-RAG Architecture Overview](./figures/logic_rag_pipeline_full.png)
-
 ---
 
 ## Overview
@@ -24,3 +21,6 @@ This repository contains the complete implementation of the **Logic-RAG** framew
 including the perception module, query-to-logic embedder, and logical inference engine. 
 We provide inference scripts for our proposed framework along with baseline evaluation 
 scripts for GPT-4V and Claude 3.5 models to facilitate comparison.
+
+**Logic-RAG framework for visual-spatial reasoning:**
+![Logic-RAG Architecture Overview](./figures/logic_rag_pipeline_full.png)
