@@ -11,4 +11,4 @@ Test Logic-RAG on Google Colab: [![Open In Colab](https://colab.research.google.
 
 Logic-RAG framework for visual-spatial reasoning
 
-![](./figures/logic_rag_pipeline_full.png)
+![](./figures/logic_rag_pipeline_full.pdf)
