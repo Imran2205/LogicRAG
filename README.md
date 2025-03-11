@@ -24,3 +24,8 @@ scripts for GPT-4V and Claude 3.5 models to facilitate comparison.
 
 **Logic-RAG framework for visual-spatial reasoning:**
 ![Logic-RAG Architecture Overview](./figures/logic_rag_pipeline_full.png)
+
+---
+
+## Dependencies
+Python 3.9, PyTorch 2.4.1

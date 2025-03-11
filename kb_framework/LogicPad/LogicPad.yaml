@@ -2,14 +2,14 @@ atomic_predicates:
   semantic_segmentation:
     - Road(x)
     - LaneMarking(x)
-    - TrafficSign(x)
+    - Trafficsign(x)
     - Sidewalk(x)
     - Fence(x)
     - Pole(x)
     - Wall(x)
     - Building(x)
     - Vegetation(x)
-    - Vehicle(x)
+    - Vehicles(x)
     - Pedestrian(x)
     - Terrain(x)
     - Bridge(x)
@@ -17,6 +17,15 @@ atomic_predicates:
     - RailTrack(x)
     - Trafficlight(x)
     - ConstructionObj(x)
+    - Tree(x)
+    - Person(x)
+    - Billboard(x)
+    - MobileBarrier(x)
+    - FireHydrant(x)
+    - Chair(x)
+    - Trash(x)
+    - Trashcan(x)
+    - Infrastructure(x)
 
   tracker:
     - Appears(x)
@@ -31,8 +40,8 @@ atomic_predicates:
     - AtRight(x)
     - AtLeft(x)
     - AtCenter(x)
-    - DistanceIncreases(x, y)
-    - DistanceDecreases(x, y)
+    - DistanceIncrease(x, y)
+    - DistanceDecrease(x, y)
     - DistanceDecreasesToZero(x, y)
     - DistanceZeroEnd(x, y)
     - DistanceZeroStart(x, y)
@@ -101,84 +110,159 @@ functions:
 
 derived_predicates:
   - name: Stopped
-    logic: "∀x : (¬Moves(x)) → Stopped(x)"
+    logic:
+      - "∀x : ¬Move(x) ==> Stopped(x)"
+      - "∀x : ¬Moving(x) ==> Stopped(x)"
 
   - name: Walk
-    logic: "∀x : (Pedestrian(x) ∧ Moves(x)) → Walk(x)"
+    logic: "∀x : Pedestrian(x) ∧ Moving(x) ==> Walk(x)"
 
   - name: Stand
-    logic: "∀x : (Pedestrian(x) ∧ ¬Moves(x)) → Stand(x)"
+    logic: "∀x : Pedestrian(x) ∧ ¬Moving(x) ==> Stand(x)"
 
   - name: Accelerate
-    logic: "∀x : (Vehicle(x) ∧ SpeedUp(x)) → Accelerate(x)"
+    logic:
+      - "∀x : Vehicles(x) ∧ SpeedUp(x) ==> Accelerate(x)"
+      - "∀x : Pedestrian(x) ∧ SpeedUp(x) ==> Accelerate(x)"
 
   - name: Decelerate
-    logic: "∀x : (Vehicle(x) ∧ SpeedDown(x)) → Decelerate(x)"
+    logic:
+      - "∀x : Vehicles(x) ∧ SpeedDown(x) ==> Decelerate(x)"
+      - "∀x : Pedestrian(x) ∧ SpeedDown(x) ==> Decelerate(x)"
+
+  - name: NotAccelerate
+    logic: "∀x : ¬SpeedUp(x) ==> ¬Accelerate(x)"
+
+  - name: NotDecelerate
+    logic: "∀x : ¬SpeedDown(x) ==> ¬Decelerate(x)"
 
   - name: ConstantSpeed
-    logic: "∀x : (Vehicle(x) ∧ ¬SpeedUp(x) ∧ ¬SpeedDown(x)) → ConstantSpeed(x)"
+    logic:
+      - "∀x : Vehicles(x) ∧ ¬Accelerate(x) ∧ ¬Decelerate(x) ==> ConstantSpeed(x)"
+      - "∀x : Pedestrian(x) ∧ ¬Accelerate(x) ∧ ¬Decelerate(x) ==> ConstantSpeed(x)"
 
   - name: IncreasePace
-    logic: "∀x : (Pedestrian(x) ∧ SpeedUp(x)) → IncreasePace(x)"
+    logic: "∀x : Pedestrian(x) ∧ SpeedUp(x) ==> IncreasePace(x)"
 
   - name: DecreasePace
-    logic: "∀x : (Pedestrian(x) ∧ SpeedDown(x)) → DecreasePace(x)"
+    logic: "∀x : Pedestrian(x) ∧ SpeedDown(x) ==> DecreasePace(x)"
 
   - name: FixedPace
-    logic: "∀x : (Pedestrian(x) ∧ ¬SpeedUp(x) ∧ ¬SpeedDown(x)) → FixedPace(x)"
+    logic: "∀x : Pedestrian(x) ∧ ¬SpeedUp(x) ∧ ¬SpeedDown(x) ==> FixedPace(x)"
 
   - name: Move
     logic:
-      - "∀x : (Vehicles(x) ∧ Moving(x)) → Move(x)"
-      - "∀x : (Pedestrian(x) ∧ Moving(x)) → Move(x)"
+      - "∀x : Vehicles(x) ∧ Moving(x) ==> Move(x)"
+      - "∀x : Pedestrian(x) ∧ Moving(x) ==> Move(x)"
 
   - name: GettingCloser
-    logic: "∀x,y : (DistanceDecreases(x, y)) → GettingCloser(x, y)"
+    logic: "∀x,y : DistanceDecrease(x, y) ==> GettingCloser(x, y)"
 
   - name: Collide
-    logic: "∀x,y : (DistanceDecreases(x, y) ∧ DistanceDecreasesToZero(x, y)) → Collide(x, y)"
+    logic: "∀x,y : DistanceDecrease(x, y) ∧ DistanceDecreasesToZero(x, y) ∧ Vehicles(x) ∧ Vehicles(y) ==> Collide(x, y)"
 
   - name: ComeClose
-    logic: "∀x,y : (DistanceDecrease(x, y)) → ComeClose(x, y)"
+    logic: "∀x,y : DistanceDecrease(x, y) ==> ComeClose(x, y)"
 
   - name: GoAway
-    logic: "∀x,y : (DistanceIncrease(x, y)) → GoAway(x, y)"
+    logic: "∀x,y : DistanceIncrease(x, y) ==> GoAway(x, y)"
 
   - name: ConstantDistance
     logic:
-      - "∀x,y : (NotDistanceDecrease(x, y) ∧ NotDistanceIncrease(x, y)) → ConstantDistance(x, y)"
-      - "∀x,y : (¬DistanceDecrease(x, y) ∧ ¬DistanceIncrease(x, y)) → ConstantDistance(x, y)"
+      - "∀x,y : ¬DistanceDecrease(x, y) ∧ ¬DistanceIncrease(x, y) ==> ConstantDistance(x, y)"
 
   - name: Cross
-    logic: "∀x : (Pedestrian(x) ∧ On(x, y) ∧ Road(y)) → Cross(x)"
+    logic: "∀x : Pedestrian(x) ∧ On(x, y) ∧ Road(y) ==> Cross(x)"
 
   - name: NotCross
-    logic: "∀x : (Pedestrian(x) ∧ On(x, y) ∧ Sidewalk(y)) → NotCross(x)"
+    logic: "∀x : Pedestrian(x) ∧ On(x, y) ∧ Sidewalk(y) ==> NotCross(x)"
 
   - name: Crash
-    logic: "∀x,y : (DistanceDecrease(x, y) ∧ DistanceZeroEnd(x, y) ∧ ConstructionObj(y) ∧ Vehicles(x)) → Crash(x, y)"
+    logic: "∀x,y : DistanceDecrease(x, y) ∧ DistanceZeroEnd(x, y) ∧ ConstructionObj(y) ∧ Vehicles(x) ==> Crash(x, y)"
 
   - name: Merge
-    logic: "∀x,y : (DistanceDecrease(x, y) ∧ DistanceZeroEnd(x, y) ∧ Disappear(x) ∧ Vehicles(y) ∧ Vehicles(x)) → Merge(x, y)"
+    logic: "∀x,y : DistanceDecrease(x, y) ∧ DistanceZeroEnd(x, y) ∧ Disappear(x) ∧ Vehicles(y) ∧ Vehicles(x) ==> Merge(x, y)"
 
   - name: Enter
-    logic: "∀x,y : (DistanceDecrease(x, y) ∧ DistanceZeroEnd(x, y) ∧ Disappear(x) ∧ Vehicles(y) ∧ Pedestrian(x)) → Enter(x, y)"
+    logic: "∀x,y : DistanceDecrease(x, y) ∧ DistanceZeroEnd(x, y) ∧ Disappear(x) ∧ Vehicles(y) ∧ Pedestrian(x) ==> Enter(x, y)"
 
   - name: Diverge
-    logic: "∀x,y : (DistanceIncrease(x, y) ∧ DistanceZeroStart(x, y) ∧ Appear(x) ∧ Vehicles(y) ∧ Vehicles(x)) → Diverge(x, y)"
+    logic: "∀x,y : DistanceIncrease(x, y) ∧ DistanceZeroStart(x, y) ∧ Appear(x) ∧ Vehicles(y) ∧ Vehicles(x) ==> Diverge(x, y)"
 
   - name: Exit
-    logic: "∀x,y : (DistanceIncrease(x, y) ∧ DistanceZeroStart(x, y) ∧ Appear(x) ∧ Vehicles(y) ∧ Pedestrian(x)) → Exit(x, y)"
+    logic: "∀x,y : DistanceIncrease(x, y) ∧ DistanceZeroStart(x, y) ∧ Appear(x) ∧ Vehicles(y) ∧ Pedestrian(x) ==> Exit(x, y)"
 
   - name: Ride
-    logic: "∀x,y : (Pedestrian(x) ∧ Vehicles(y) ∧ TypeOf(y, Motorcycle) ∧ On(x, y)) → Ride(x, y)"
+    logic: "∀x,y : Pedestrian(x) ∧ Vehicles(y) ∧ TypeOf(y, Motorcycle) ∧ On(x, y) ==> Ride(x, y)"
 
-  - name: NotAccelerate
-    logic:
-      - "∀x : (¬SpeedUp(x)) → NotAccelerate(x)"
-      - "∀x : (NotSpeedUp(x)) → NotAccelerate(x)"
+  - name: IsVehicles
+    logic: "∀x : Vehicles(x) ==> IsVehicles(x)"
 
-  - name: NotDecelerate
+  - name: IsBuilding
+    logic: "∀x : Building(x) ==> IsBuilding(x)"
+
+  - name: IsPerson
     logic:
-      - "∀x : (¬SpeedDown(x)) → NotDecelerate(x)"
-      - "∀x : (NotSpeedDown(x)) → NotDecelerate(x)"
+      - "∀x : Pedestrian(x) ==> Person(x)"
+      - "∀x : Person(x) ==> IsPerson(x)"
+
+  - name: IsPedestrian
+    logic:
+      - "∀x : Person(x) ==> Pedestrian(x)"
+      - "∀x : Pedestrian(x) ==> IsPedestrian(x)"
+
+  - name: IsInfrastructure
+    logic: "∀x : Infrastructure(x) ==> IsInfrastructure(x)"
+
+  - name: IsFence
+    logic: "∀x : Fence(x) ==> IsFence(x)"
+
+  - name: IsBillboard
+    logic: "∀x : Billboard(x) ==> IsBillboard(x)"
+
+  - name: IsMobileBarrier
+    logic: "∀x : MobileBarrier(x) ==> IsMobileBarrier(x)"
+
+  - name: IsFireHydrant
+    logic: "∀x : FireHydrant(x) ==> IsFireHydrant(x)"
+
+  - name: IsChair
+    logic: "∀x : Chair(x) ==> IsChair(x)"
+
+  - name: IsTrash
+    logic: "∀x : Trash(x) ==> IsTrash(x)"
+
+  - name: IsTrashcan
+    logic: "∀x : Trashcan(x) ==> IsTrashcan(x)"
+
+  - name: IsTerrain
+    logic: "∀x : Terrain(x) ==> IsTerrain(x)"
+
+  - name: IsBridge
+    logic: "∀x : Bridge(x) ==> IsBridge(x)"
+
+  - name: IsPole
+    logic: "∀x : Pole(x) ==> IsPole(x)"
+
+  - name: IsGuardrail
+    logic: "∀x : Guardrail(x) ==> IsGuardrail(x)"
+
+  - name: IsRailTrack
+    logic: "∀x : RailTrack(x) ==> IsRailTrack(x)"
+
+  - name: IsVegetation
+    logic: "∀x : Vegetation(x) ==> IsVegetation(x)"
+
+  - name: IsTrafficlight
+    logic: "∀x : Trafficlight(x) ==> IsTrafficlight(x)"
+
+  - name: IsTrafficSign
+    logic:
+      - "∀x : Trafficsign(x) ==> TrafficSign(x)"
+      - "∀x : TrafficSign(x) ==> IsTrafficSign(x)"
+
+  - name: Appeared
+    logic: "∀x : Appear(x) ==> Appeared(x)"
+
+  - name: Disappeared
+    logic: "∀x : Disappear(x) ==> Disappeared(x)"

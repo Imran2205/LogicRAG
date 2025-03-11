@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 import os
 import sys
 import pickle
@@ -13,6 +12,7 @@ from natsort import natsorted
 from tqdm import tqdm
 import multiprocessing
 from functools import partial
+import yaml
 
 # Label dictionary mapping class IDs to names
 LABELS_DICT = {
@@ -326,7 +326,35 @@ def calculate_distances(objects, window_frames):
     return distances
 
 
-def build_kb_for_window(track_data, window_start, window_size=10, rules_file=None):
+def convert_yaml_rule_to_implication(rule):
+    """
+    Convert a YAML rule format to AIMA implication format
+
+    Args:
+        rule: Rule in YAML format (e.g., "∀x : (Vehicle(x) ∧ SpeedUp(x)) ==> Accelerate(x)")
+
+    Returns:
+        Rule in AIMA format (e.g., "Vehicle(x) & SpeedUp(x) ==> Accelerate(x)")
+    """
+    # Remove universal quantifiers and parentheses
+    if '∀' in rule:
+        # Extract the rule part after the colon
+        rule_part = rule.split(':', 1)[1].strip()
+
+        # Remove outer parentheses if present
+        if rule_part.startswith('(') and rule_part.endswith(')'):
+            rule_part = rule_part[1:-1].strip()
+
+        # Replace logical symbols with their text equivalents
+        rule_part = rule_part.replace('∧', '&').replace('¬', 'Not')
+
+        return rule_part
+    else:
+        # For rules already in AIMA format, just standardize the symbols
+        return rule.replace('∧', '&').replace('¬', 'Not')
+
+
+def build_kb_for_window(track_data, window_start, window_size=10, logic_pad=None):
     """
     Build Knowledge Base for a specific window
 
@@ -334,7 +362,7 @@ def build_kb_for_window(track_data, window_start, window_size=10, rules_file=Non
         track_data: Dictionary of track data by class
         window_start: Starting frame number
         window_size: Number of frames in window
-        rules_file: Path to file containing implication rules
+        logic_pad: Path to LogicPad
 
     Returns:
         Knowledge Base object and list of predicates
@@ -357,9 +385,27 @@ def build_kb_for_window(track_data, window_start, window_size=10, rules_file=Non
 
     # Initialize Knowledge Base with implications
     KB = None
-    if rules_file and os.path.exists(rules_file):
-        with open(rules_file, 'r') as f:
-            rules = [line.strip() for line in f.readlines() if line.strip()]
+    if logic_pad and os.path.exists(logic_pad):
+        # Load rules from YAML file
+        with open(logic_pad, 'r') as f:
+            yaml_data = yaml.safe_load(f)
+
+        # Initialize list to hold all rules
+        rules = []
+
+        # Extract rules from different categories in YAML
+        if 'derived_predicates' in yaml_data:
+            for predicate in yaml_data['derived_predicates']:
+                if 'logic' in predicate:
+                    logic = predicate['logic']
+                    # Handle both string and list formats
+                    if isinstance(logic, str):
+                        rules.append(convert_yaml_rule_to_implication(logic))
+                    elif isinstance(logic, list):
+                        for rule in logic:
+                            rules.append(convert_yaml_rule_to_implication(rule))
+
+        # Convert rules to AIMA format
         clauses = [aima.utils.expr(rule) for rule in rules]
         KB = aima.logic.FolKB(clauses)
     else:
@@ -681,7 +727,7 @@ def save_kb(KB, predicates, output_file):
             f.write(f"{clause}\n")
 
 
-def process_video(video_name, tracker_dir, output_dir, rules_file=None, window_size=10):
+def process_video(video_name, tracker_dir, output_dir, logic_pad=None, window_size=10):
     """
     Process a video and generate knowledge bases for each window
 
@@ -689,7 +735,7 @@ def process_video(video_name, tracker_dir, output_dir, rules_file=None, window_s
         video_name: Name of the video
         tracker_dir: Directory containing tracker data
         output_dir: Directory to save output files
-        rules_file: Path to file containing implication rules
+        logic_pad: Path to LogicPad
         window_size: Window size in frames
     """
     print(f"Processing video: {video_name}")
@@ -721,7 +767,7 @@ def process_video(video_name, tracker_dir, output_dir, rules_file=None, window_s
     # Process each window
     for window_start in range(all_frames[0], all_frames[-1], window_size):
         # Build KB for this window
-        KB, predicates = build_kb_for_window(track_data, window_start, window_size, rules_file)
+        KB, predicates = build_kb_for_window(track_data, window_start, window_size, logic_pad)
 
         if KB and predicates:
             # Save KB to file
@@ -742,8 +788,8 @@ def process_video(video_name, tracker_dir, output_dir, rules_file=None, window_s
 
 def process_video_parallel(args):
     """Wrapper function for process_video to use with multiprocessing"""
-    video_name, tracker_dir, output_dir, rules_file, window_size = args
-    process_video(video_name, tracker_dir, output_dir, rules_file, window_size)
+    video_name, tracker_dir, output_dir, logic_pad, window_size = args
+    process_video(video_name, tracker_dir, output_dir, logic_pad, window_size)
     return f"Completed processing {video_name}"
 
 
@@ -753,7 +799,7 @@ def main():
     parser = argparse.ArgumentParser(description="Convert tracker data to First-Order Logic Knowledge Base")
     parser.add_argument("--tracker_dir", required=True, help="Directory containing tracker data")
     parser.add_argument("--output_dir", required=True, help="Directory to save output files")
-    parser.add_argument("--rules_file", help="Path to file containing implication rules")
+    parser.add_argument("--logic_pad", help="Path to LogicPad")
     parser.add_argument("--dataset", help="Name of the Dataset")
     parser.add_argument("--window_size", type=int, default=10, help="Window size in frames")
     parser.add_argument("--num_processes", type=int, default=8,
@@ -779,7 +825,7 @@ def main():
     # Prepare arguments for each video
     process_args = []
     for video_name in video_list:
-        process_args.append((video_name, args.tracker_dir, args.output_dir, args.rules_file,
+        process_args.append((video_name, args.tracker_dir, args.output_dir, args.logic_pad,
                              args.window_size))
 
     # Process videos in parallel
