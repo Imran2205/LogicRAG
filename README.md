@@ -66,7 +66,7 @@ unzip LogicRAG_Data.zip
 ```
 
 ### Test Logic-RAG Using Precomputed Data
-To run the inference using precomputed knowledge base and tracker trajectories run:
+To run the inference using precomputed knowledge base and tracker trajectories, run:
 
 ```bash
 cd kb_framework/kb_inference
