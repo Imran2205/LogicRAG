@@ -1,10 +1,10 @@
 --model_name pixelformer_kittieigen
 --encoder large07
 --dataset carla_depth
---input_height 375
---input_width 1242
+--input_height 480
+--input_width 640
 --max_depth 1000
 
---data_path /data/datasets/KITTI/STEP
---filenames_file /data/projects/PixelFormer-mod/test.txt
---checkpoint_path /data/projects/PixelFormer-mod/weights/kitti.pth
+--data_path /kaggle/input/rgb-new/rgb_new
+--filenames_file /kaggle/input/rgb-new/rgb_new/images_017_list.txt
+--checkpoint_path /kaggle/input/pixel-former-trained-models/models/pixelformer_carla_depth/model-58905-best_log_rms_0.23159

@@ -107,10 +107,7 @@ class DataLoadPreprocess(Dataset):
             depth_path = os.path.join(self.args.gt_path, depth_file)
     
             image = Image.open(image_path)  # .convert('RGB')
-            if self.args.dataset == 'carla_depth':
-                depth_gt = Image.open(depth_path)  # .convert('I')
-            else:
-                depth_gt = Image.open(depth_path)
+            depth_gt = Image.open(depth_path)
 
             # print(np.unique(depth_gt), np.asarray(depth_gt).shape)
 
@@ -179,7 +176,7 @@ class DataLoadPreprocess(Dataset):
                 data_path = self.args.data_path
 
             image_path = os.path.join(data_path, "./" + sample_path.split()[0])
-            if self.mode == 'test':
+            if self.mode == 'test' and self.args.dataset == 'carla_depth':
                 image = np.asarray(Image.open(image_path).resize((640, 360)), dtype=np.float32) / 255.0
                 pad_img = np.zeros((480, 640, 3), dtype=np.float32)
                 pad_img[60:60+360, :] = image
@@ -190,15 +187,12 @@ class DataLoadPreprocess(Dataset):
             if self.mode == 'online_eval':
                 gt_path = self.args.gt_path_eval
                 depth_path = os.path.join(gt_path, "./" + sample_path.split()[1])
-                # if self.args.dataset == 'kitti':
-                #     depth_path = os.path.join(gt_path, sample_path.split()[0].split('/')[0], sample_path.split()[1])
+                if self.args.dataset == 'kitti':
+                    depth_path = os.path.join(gt_path, sample_path.split()[0].split('/')[0], sample_path.split()[1])
                 has_valid_depth = False
                 try:
                     # depth_gt = Image.open(depth_path)  # .convert('L')
-                    if self.args.dataset == 'carla_depth':
-                        depth_gt = Image.open(depth_path)  # .convert('I')
-                    else:
-                        depth_gt = Image.open(depth_path)
+                    depth_gt = Image.open(depth_path)
                     has_valid_depth = True
                 except IOError:
                     depth_gt = False
@@ -223,12 +217,13 @@ class DataLoadPreprocess(Dataset):
                 if self.mode == 'online_eval' and has_valid_depth:
                     depth_gt = depth_gt[top_margin:top_margin + 352, left_margin:left_margin + 1216, :]
 
-            if self.mode == 'test':
-                if image.shape[0] != self.args.input_height or image.shape[1] != self.args.input_width:
-                    image, _ = self.center_crop(image, image, self.args.input_height, self.args.input_width)
-            else:
-                if image.shape[0] != self.args.input_height or image.shape[1] != self.args.input_width:
-                    image, depth_gt = self.center_crop(image, depth_gt, self.args.input_height, self.args.input_width)
+            if self.args.dataset == 'carla_depth':
+                if self.mode == 'test':
+                    if image.shape[0] != self.args.input_height or image.shape[1] != self.args.input_width:
+                        image, _ = self.center_crop(image, image, self.args.input_height, self.args.input_width)
+                else:
+                    if image.shape[0] != self.args.input_height or image.shape[1] != self.args.input_width:
+                        image, depth_gt = self.center_crop(image, depth_gt, self.args.input_height, self.args.input_width)
 
             if self.mode == 'online_eval':
                 sample = {'image': image, 'depth': depth_gt, 'focal': focal, 'has_valid_depth': has_valid_depth, 'path': image_path}

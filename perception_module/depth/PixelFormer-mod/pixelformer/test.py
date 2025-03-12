@@ -46,7 +46,7 @@ else:
     args = parser.parse_args()
 
 if args.dataset == 'kitti' or args.dataset == 'nyu' or args.dataset == 'carla_depth':
-    from dataloaders.dataloader import NewDataLoader
+    from dataloaders.dataloader_lrag import NewDataLoader
 elif args.dataset == 'kittipred':
     from dataloaders.dataloader_kittipred import NewDataLoader
 

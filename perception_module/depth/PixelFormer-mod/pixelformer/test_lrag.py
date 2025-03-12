@@ -38,6 +38,7 @@ parser.add_argument('--checkpoint_path', type=str, help='path to a specific chec
 parser.add_argument('--dataset', type=str, help='dataset to train on', default='nyu')
 parser.add_argument('--do_kb_crop', help='if set, crop input images as kitti benchmark images', action='store_true')
 parser.add_argument('--save_viz', help='if set, save visulization of the outputs', action='store_true')
+parser.add_argument('--output', type=str, help='path to the output folder', required=True)
 
 if sys.argv.__len__() == 2:
     arg_filename_with_prefix = '@' + sys.argv[1]
@@ -46,7 +47,7 @@ else:
     args = parser.parse_args()
 
 if args.dataset == 'kitti' or args.dataset == 'nyu' or args.dataset == 'carla_depth':
-    from dataloaders.dataloader import NewDataLoader
+    from dataloaders.dataloader_lrag import NewDataLoader
 elif args.dataset == 'kittipred':
     from dataloaders.dataloader_kittipred import NewDataLoader
 
@@ -61,16 +62,16 @@ def get_num_lines(file_path):
     return len(lines)
 
 
-def center_crop(img, height, width):
-    # print(img.shape, height, depth)
-    assert img.shape[0] >= height
-    assert img.shape[1] >= width
-    assert img.shape[0] == depth.shape[0]
-    assert img.shape[1] == depth.shape[1]
-    x = (img.shape[1] - width) // 2
-    y = (img.shape[0] - height) // 2
-    img = img[y:y + height, x:x + width, :]
-    return img
+# def center_crop(img, height, width):
+#     # print(img.shape, height, depth)
+#     assert img.shape[0] >= height
+#     assert img.shape[1] >= width
+#     assert img.shape[0] == depth.shape[0]
+#     assert img.shape[1] == depth.shape[1]
+#     x = (img.shape[1] - width) // 2
+#     y = (img.shape[0] - height) // 2
+#     img = img[y:y + height, x:x + width, :]
+#     return img
 
 
 def test(params):
@@ -96,17 +97,13 @@ def test(params):
 
     print('now testing {} files with {}'.format(num_test_samples, args.checkpoint_path))
 
-    save_name = 'models/result_' + args.model_name
+    save_name = args.output  # 'models/result_' + args.model_name
 
     print('Saving result pngs..')
 
     if not os.path.exists(save_name):
         try:
             os.mkdir(save_name)
-            os.mkdir(save_name + '/raw')
-            os.mkdir(save_name + '/cmap')
-            os.mkdir(save_name + '/rgb')
-            os.mkdir(save_name + '/gt')
         except OSError as e:
             if e.errno != errno.EEXIST:
                 raise
@@ -117,43 +114,48 @@ def test(params):
         for s, sample in enumerate(tqdm(dataloader.data)):
             if args.dataset == 'kitti':
                 date_drive = lines[s].split('/')[1]
-                filename_pred_png = save_name + '/raw/' + date_drive + '_' + lines[s].split()[0].split('/')[-1].replace(
-                    '.jpg', '.png')
-                filename_cmap_png = save_name + '/cmap/' + date_drive + '_' + lines[s].split()[0].split('/')[
-                    -1].replace('.jpg', '.png')
-                filename_image_png = save_name + '/rgb/' + date_drive + '_' + lines[s].split()[0].split('/')[-1]
+                kitti_raw_out_folder = os.path.join(save_name, f'{date_drive}/depth/')
+                if not os.path.exists(kitti_raw_out_folder):
+                    os.makedirs(kitti_raw_out_folder)
+                filename_pred_png = os.path.join(
+                    kitti_raw_out_folder,
+                    date_drive + '_' + lines[s].split()[0].split('/')[-1].replace('.jpg', '.png')
+                )
+                # filename_cmap_png = save_name + '/cmap/' + date_drive + '_' + lines[s].split()[0].split('/')[
+                #     -1].replace('.jpg', '.png')
+                # filename_image_png = save_name + '/rgb/' + date_drive + '_' + lines[s].split()[0].split('/')[-1]
             elif args.dataset == 'kittipred':
-                filename_pred_png = save_name + '/raw/' + lines[s].split()[0].split('/')[-1].replace('.jpg', '.png')
-                filename_cmap_png = save_name + '/cmap/' + lines[s].split()[0].split('/')[-1].replace('.jpg', '.png')
-                filename_image_png = save_name + '/rgb/' + lines[s].split()[0].split('/')[-1]
+                filename_pred_png = save_name + '/depth/' + lines[s].split()[0].split('/')[-1].replace('.jpg', '.png')
+                # filename_cmap_png = save_name + '/cmap/' + lines[s].split()[0].split('/')[-1].replace('.jpg', '.png')
+                # filename_image_png = save_name + '/rgb/' + lines[s].split()[0].split('/')[-1]
             elif args.dataset == 'nyu':
                 scene_name = lines[s].split()[0].split('/')[0]
-                filename_pred_png = save_name + '/raw/' + scene_name + '_' + lines[s].split()[0].split('/')[1].replace(
+                filename_pred_png = save_name + '/depth/' + scene_name + '_' + lines[s].split()[0].split('/')[1].replace(
                     '.jpg', '.png')
-                filename_cmap_png = save_name + '/cmap/' + scene_name + '_' + lines[s].split()[0].split('/rgb_')[
-                    1].replace(
-                    '.jpg', '.png')
-                filename_gt_png = save_name + '/gt/' + scene_name + '_' + lines[s].split()[0].split('/rgb_')[1].replace(
-                    '.jpg', '_gt.png')
-                filename_image_png = save_name + '/rgb/' + scene_name + '_' + lines[s].split()[0].split('/rgb_')[1]
+                # filename_cmap_png = save_name + '/cmap/' + scene_name + '_' + lines[s].split()[0].split('/rgb_')[
+                #     1].replace(
+                #     '.jpg', '.png')
+                # filename_gt_png = save_name + '/gt/' + scene_name + '_' + lines[s].split()[0].split('/rgb_')[1].replace(
+                #     '.jpg', '_gt.png')
+                # filename_image_png = save_name + '/rgb/' + scene_name + '_' + lines[s].split()[0].split('/rgb_')[1]
             else:
                 scene_name = lines[s].split()[0].split('/')[0]
-                filename_pred_png = save_name + '/raw/' + "/".join(lines[s].split()[0].split('/')[-2:]).replace(
+                filename_pred_png = save_name + f'{scene_name}/depth/' + "/".join(lines[s].split()[0].split('/')[-2:]).replace(
                     '.jpg', '.png')
-                filename_cmap_png = save_name + '/cmap/' + "/".join(lines[s].split()[0].split('/')[-2:]).replace(
-                    '.jpg', '.png')
-                filename_gt_png = save_name + '/gt/' + "/".join(lines[s].split()[0].split('/')[-2:]).replace(
-                    '.jpg', '.png')
-                filename_image_png = save_name + '/rgb/' + "/".join(lines[s].split()[0].split('/')[-2:])
+                # filename_cmap_png = save_name + '/cmap/' + "/".join(lines[s].split()[0].split('/')[-2:]).replace(
+                #     '.jpg', '.png')
+                # filename_gt_png = save_name + '/gt/' + "/".join(lines[s].split()[0].split('/')[-2:]).replace(
+                #     '.jpg', '.png')
+                # filename_image_png = save_name + '/rgb/' + "/".join(lines[s].split()[0].split('/')[-2:])
 
             if not os.path.exists("/".join(filename_pred_png.split('/')[:-1])):
                 os.makedirs("/".join(filename_pred_png.split('/')[:-1]))
-            if not os.path.exists("/".join(filename_cmap_png.split('/')[:-1])):
-                os.makedirs("/".join(filename_cmap_png.split('/')[:-1]))
+            # if not os.path.exists("/".join(filename_cmap_png.split('/')[:-1])):
+            #     os.makedirs("/".join(filename_cmap_png.split('/')[:-1]))
             # if not os.path.exists("/".join(filename_gt_png.split('/')[:-1])):
             #     os.makedirs("/".join(filename_gt_png.split('/')[:-1]))
-            if not os.path.exists("/".join(filename_image_png.split('/')[:-1])):
-                os.makedirs("/".join(filename_image_png.split('/')[:-1]))
+            # if not os.path.exists("/".join(filename_image_png.split('/')[:-1])):
+            #     os.makedirs("/".join(filename_image_png.split('/')[:-1]))
 
             image = Variable(sample['image'].cuda())
             # Predict

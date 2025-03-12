@@ -59,14 +59,18 @@ def process_folder(folder_path, output_dir, model, device, dataset, sample_inter
     """
     print(f"Processing folder: {folder_path}")
 
-    # Create output directory
-    folder_name = folder_path.split('/')[-2] # os.path.basename(os.path.normpath(folder_path))
-    folder_output_dir = os.path.join(output_dir, folder_name)
+    if dataset == 'KITTI':
+        folder_name = os.path.basename(os.path.normpath(folder_path))
+    else:
+        folder_name = folder_path.split('/')[-2]
+
+    folder_output_dir = os.path.join(output_dir, folder_name, 'flow')
     os.makedirs(folder_output_dir, exist_ok=True)
 
     # Load all frames
     frames = load_frames_from_folder(folder_path)
     print(f"Loaded {len(frames)} frames from {folder_path}")
+    print(f"Saving to {folder_output_dir}")
 
     # Process consecutive frame pairs
     for i in tqdm(range(len(frames) - 1), desc="Processing frame pairs"):
@@ -136,7 +140,7 @@ def process_folder(folder_path, output_dir, model, device, dataset, sample_inter
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        "--parent_folder",
+        "--dataset_root",
         required=True,
         help="Parent folder containing subfolders of image sequences",
     )
@@ -194,12 +198,15 @@ if __name__ == "__main__":
     print(f"Model loaded on {DEFAULT_DEVICE}")
 
     # Get all subfolders in the parent folder
-    subfolders = natsorted([f.path+'/rgb' for f in os.scandir(args.parent_folder) if f.is_dir()])
+    if args.dataset == 'CARLA':
+        subfolders = natsorted([f.path+'/rgb' for f in os.scandir(args.dataset_root) if f.is_dir()])
+    else:
+        subfolders = natsorted([f.path for f in os.scandir(args.dataset_root) if f.is_dir()])
 
     # print(subfolders)
 
     if not subfolders:
-        print(f"No subfolders found in {args.parent_folder}")
+        print(f"No subfolders found in {args.dataset_root}")
         exit(1)
 
     print(f"Found {len(subfolders)} video folders to process")

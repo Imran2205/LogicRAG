@@ -6,6 +6,7 @@
 --max_depth 80
 --do_kb_crop
 
---data_path /data/datasets/KITTI/STEP
---filenames_file /data/projects/PixelFormer-mod/test.txt
---checkpoint_path /data/projects/PixelFormer-mod/weights/kitti.pth
+--data_path /data/datasets/KITTI/MOT/testing
+--filenames_file ./data_splits/kitti_lrag_test.txt
+--checkpoint_path ../../../LogicRAG_Data/model_weights/PixelFormer/kitti.pth
+--output ../../../track_in_kitti_test/

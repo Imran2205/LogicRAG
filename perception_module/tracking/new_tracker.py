@@ -1562,7 +1562,7 @@ def main():
     import argparse
 
     parser = argparse.ArgumentParser(description="Track instances in panoptic segmentation using flow and depth")
-    parser.add_argument("--parent_dir", required=True, help="Parent directory containing video folders")
+    parser.add_argument("--data_dir", required=True, help="Parent directory containing semantic labels, depth. keypoints and optical flow")
     parser.add_argument("--output_dir", required=True, help="Directory to save tracker outputs")
     parser.add_argument("--rgb_base_dir", default="/data/datasets/KITTI/STEP/testing/image_02",
                         help="Base directory for RGB images")
@@ -1570,7 +1570,7 @@ def main():
     parser.add_argument("--color_model_path", default=None, help="Path to vehicle color model")
     parser.add_argument("--num_processes", type=int, default=8,
                         help="Number of processes to use (default: number of CPU cores)")
-    parser.add_argument("--dataset", default='CARLA', help="NAme of the dataset")
+    parser.add_argument("--dataset", default='CARLA', help="Name of the dataset")
 
     args = parser.parse_args()
 
@@ -1584,12 +1584,12 @@ def main():
     os.makedirs(args.output_dir, exist_ok=True)
 
     # Find all video directories
-    video_dirs = natsorted([f.path for f in os.scandir(args.parent_dir) if f.is_dir()])  # [16:]  # [5:]  # [20:]
+    video_dirs = natsorted([f.path for f in os.scandir(args.data_dir) if f.is_dir()])  # [16:]  # [5:]  # [20:]
 
     # print(video_dirs)
 
     if not video_dirs:
-        print(f"No video directories found in {args.parent_dir}")
+        print(f"No video directories found in {args.data_dir}")
         return
 
     # Process each video
