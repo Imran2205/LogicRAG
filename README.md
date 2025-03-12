@@ -91,7 +91,7 @@ steps.
 ### 1. Perception Module
 
 #### 1.1 Segmentation (Mask2Former)
-Generate semantic segmentation masks for scene understanding:
+Generate semantic segmentation masks for scene understanding using the following commands:
 
 ```bash
 cd perception_module/segmentation/Mask2Former-mod
@@ -105,7 +105,7 @@ python demo/demo.py --config-file ./configs/cityscapes/panoptic-segmentation/swi
 ```
 
 #### 1.2 Depth Estimation (PixelFormer)
-Generate depth maps for the scene:
+To generate depth maps for the scene, run:
 
 ```bash
 cd perception_module/depth/PixelFormer-mod
@@ -138,7 +138,7 @@ image_02/0000/000001.png
 
 
 #### 1.3 Optical Flow Estimation (CoTracker3)
-Generate optical flow data:
+Run the following commands to generate optical flow data:
 
 ```bash
 cd perception_module/optical_flow/co-tracker
@@ -169,7 +169,7 @@ python key_point_extractor.py \
 ```
 
 #### 2.2 Object Instance Tracking
-Track objects across frames:
+Track objects across frames and save the trajectories to `../../track_out_kitti_test`:
 
 ```bash
 cd perception_module/tracking
@@ -186,7 +186,7 @@ python new_tracker.py \
 
 ### 3. Knowledge Base Generation
 
-Generate the FOL knowledge base from tracking data:
+Generate the FOL knowledge base from tracking data and save to `../../kb_out_kitti_test`:
 
 ```bash
 cd kb_framework/kb_generator
