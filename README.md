@@ -52,7 +52,7 @@ cd perception_module/segmentation/Mask2Former-mod/modeling/pixel_decoder/ops
 sh make.sh
 ```
 
-### Download Pre-trained Models and PreComputed Knowledge Base
+### Download Pre-trained Models and Precomputed Knowledge Base
 Download all the pre-computed knowledge base for KITTI and model weights from the following link:
 [Pre-trained Models & KB (Google Drive)](https://drive.google.com/file/d/14vRnzCDD9rw63Os3w-Ii4ZF_352y__km/view?usp=drive_link)
 
