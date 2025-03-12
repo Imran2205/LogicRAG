@@ -211,6 +211,9 @@ Use the notebook `kb_framework/kb_inference/fol_translate_llama.ipynb` to transl
 to first-order logic. The translations will be saved to a CSV file 
 (e.g., `./kb_framework/kb_inference/translated_queries/question_query_kitti_llama33.csv`).
 
+Note: We precomputed the translations csv file. so that we do not need to 
+load LlaMa 3 each time we run inference. 
+
 ### 4. Inference
 
 Run inference using the generated knowledge base:
