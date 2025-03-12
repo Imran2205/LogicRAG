@@ -58,6 +58,28 @@ Download all the pre-computed knowledge base for KITTI and model weights from th
 
 Extract the downloaded file to the root of this repository.
 
+Alternatively, you can download and extract the file using the following commands:
+```bash
+gdown 14vRnzCDD9rw63Os3w-Ii4ZF_352y__km
+
+unzip LogicRAG_Data.zip
+```
+
+### Test Logic-RAG using precomputed data
+To run the inference using precomputed knowledge base and tracker trajectories run:
+
+```bash
+cd kb_framework/kb_inference
+
+python inference_in_kb.py \
+  --csv ../kitti_questions/kitti_que.csv \
+  --fol_trans_csv ./translated_queries/question_query_kitti_llama33.csv \
+  --kb_dir ../../LogicRAG_Data/precomputed_knowledge_base/kb_out_kitti \
+  --tracker_dir ../../LogicRAG_Data/tracker_trajectories/track_out_kitti \
+  --output logic_rag_response.csv
+```
+
+
 ---
 
 ## Usage
