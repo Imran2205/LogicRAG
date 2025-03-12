@@ -192,13 +192,13 @@ if __name__ == "__main__":
                 vid_name = path.split('/')[-2]
                 if os.path.isdir(args.output):
                     assert os.path.isdir(args.output), args.output
-                    if not os.path.exists(os.path.join(args.output, vid_name, 'combined')):
-                        os.makedirs(os.path.join(args.output, vid_name, 'combined'))
-
-                    out_filename = os.path.join(
-                        args.output, vid_name, 'combined',
-                        f"{vid_name}_{os.path.basename(path)}"
-                    )
+                    # if not os.path.exists(os.path.join(args.output, vid_name, 'combined')):
+                    #     os.makedirs(os.path.join(args.output, vid_name, 'combined'))
+                    #
+                    # out_filename = os.path.join(
+                    #     args.output, vid_name, 'combined',
+                    #     f"{vid_name}_{os.path.basename(path)}"
+                    # )
 
                     if not os.path.exists(os.path.join(args.output, vid_name, 'label')):
                         os.makedirs(os.path.join(args.output, vid_name, 'label'))
@@ -211,7 +211,7 @@ if __name__ == "__main__":
                 else:
                     assert len(args.input) == 1, "Please specify a directory with args.output"
                     out_filename = args.output
-                visualized_output.save(out_filename)
+                # visualized_output.save(out_filename)
             else:
                 cv2.namedWindow(WINDOW_NAME, cv2.WINDOW_NORMAL)
                 cv2.imshow(WINDOW_NAME, visualized_output.get_image()[:, :, ::-1])
