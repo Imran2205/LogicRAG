@@ -128,7 +128,7 @@ The configuration file should contain:
 --checkpoint_path ../../../LogicRAG_Data/model_weights/PixelFormer/kitti.pth
 --output ../../../track_in_kitti_test/
 ```
-Please replace 'data_path' value with the actual path to KITTI MOT test dataset.
+Please replace `data_path` value with the actual path to KITTI MOT test dataset.
 
 Note: You can either use `./data_splits/kitti_lrag_test.txt` as `filenames_file` without modification 
 or 
