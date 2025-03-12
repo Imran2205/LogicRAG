@@ -130,10 +130,17 @@ The configuration file should contain:
 ```
 Please replace 'data_path' value with the actual path to KITTI MOT test dataset.
 
-Note: Ensure your `filenames_file` contains lines in the format:
+Note: You can either use `./data_splits/kitti_lrag_test.txt` as `filenames_file` without modification 
+or 
+ensure your `filenames_file` contains lines in the format:
 ```
 image_02/0000/000000.png
 image_02/0000/000001.png
+```
+Or,
+```
+image_02/0000/000000.png image_02/0000/000000.png 1000.0
+image_02/0000/000001.png image_02/0000/000001.png 1000.0
 ```
 
 
