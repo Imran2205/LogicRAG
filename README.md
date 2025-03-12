@@ -289,6 +289,13 @@ Logic-RAG significantly improves spatial reasoning accuracy:
 If you find our work useful in your research, please consider citing:
 
 ```bibtex
+@inproceedings{kabir2025logicrag,
+  title={Logic-RAG: Augmenting Large Multimodal Models with Visual-Spatial Knowledge for Road Scene Understanding},
+  author={Kabir, Imran and Reza, Md Alimoor and Billah, Syed Masum},
+  booktitle={2025 IEEE International Conference on Robotics and Automation (ICRA)},
+  year={2025},
+  organization={IEEE}
+}
 ```
 
 ## License
