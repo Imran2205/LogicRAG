@@ -239,7 +239,7 @@ python inference_in_kb.py \
   --output logic_rag_response.csv
 ```
 
-### 6. Baseline Models (Optional)
+### Baseline Models (Optional)
 
 #### GPT-4V
 Generate responses using GPT-4V for comparison:
