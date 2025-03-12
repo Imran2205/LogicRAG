@@ -99,7 +99,7 @@ cd perception_module/segmentation/Mask2Former-mod
 mkdir ../../../track_in_kitti_test/
 
 python demo/demo.py --config-file ./configs/cityscapes/panoptic-segmentation/swin/maskformer2_swin_large_IN21k_384_bs16_90k.yaml \
-  --input /path/to/kitti/MOT/testing/image_02/*/*.png \
+  --input /data/datasets/KITTI/MOT/testing/image_02/*/*.png \
   --output ../../../track_in_kitti_test/ \
   --opts MODEL.WEIGHTS ../../../LogicRAG_Data/model_weights/Mask2Former/model_final_064788.pkl
 ```
