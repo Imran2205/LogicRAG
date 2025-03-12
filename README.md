@@ -299,4 +299,4 @@ If you find our work useful in your research, please consider citing:
 We thank the authors of the following projects whose code we have adapted or used:
 - [Mask2Former](https://github.com/facebookresearch/Mask2Former)
 - [PixelFormer](https://github.com/ashutosh1807/PixelFormer)
-- [CoTracker](https://github.com/facebookresearch/co-tracker)
+- [CoTracker3](https://github.com/facebookresearch/co-tracker)
