@@ -158,9 +158,7 @@ python demo_frame.py \
   --dataset KITTI
 ```
 
-### 2. Tracking Module
-
-#### 2.1 Key Point Extraction
+#### 1.4 Key Point Extraction
 Extract static key points to serve as anchors for multilateration during tracking:
 
 ```bash
@@ -175,7 +173,7 @@ python key_point_extractor.py \
   --dataset KITTI
 ```
 
-#### 2.2 Object Instance Tracking
+#### 1.5 Object Instance Tracking
 Track objects across frames and save the trajectories to `../../track_out_kitti_test`:
 
 ```bash
@@ -191,7 +189,7 @@ python new_tracker.py \
   --dataset KITTI
 ```
 
-### 3. Knowledge Base Generation
+### 2. Knowledge Base Generation
 
 Generate the FOL knowledge base from tracking data and save to `../../kb_out_kitti_test`:
 
@@ -207,13 +205,13 @@ python final_KB_gen.py \
   --num_processes 30
 ```
 
-### 4. Query-to-Logic Translation
+### 3. Query-to-Logic Translation
 
 Use the notebook `kb_framework/kb_inference/fol_translate_llama.ipynb` to translate natural language questions 
 to first-order logic. The translations will be saved to a CSV file 
 (e.g., `./kb_framework/kb_inference/translated_queries/question_query_kitti_llama33.csv`).
 
-### 5. Inference
+### 4. Inference
 
 Run inference using the generated knowledge base:
 
