@@ -184,7 +184,7 @@ python new_tracker.py \
   --output_dir ../../track_out_kitti_test \
   --type_model_path ../../LogicRAG_Data/model_weights/TypeDetector/best_type_model.pth \
   --color_model_path ../../LogicRAG_Data/model_weights/ColorDetector/best_color_model.pth \
-  --num_processes 8 \
+  --num_processes 30 \
   --rgb_base_dir /data/datasets/KITTI/MOT/testing/image_02 \
   --dataset KITTI
 ```

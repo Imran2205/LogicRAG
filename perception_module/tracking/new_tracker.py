@@ -266,7 +266,7 @@ class InstanceTracker:
             vehicle_crop = rgb_image[y_min:y_max, x_min:x_max].copy()
 
             # Further refine the crop by applying the mask
-            mask_crop = instance_mask[y_min:y_max, x_min:x_max]
+            # mask_crop = instance_mask[y_min:y_max, x_min:x_max]
             # vehicle_crop[~mask_crop] = [0, 0, 0]  # Set background to black
 
             # Convert to PIL Image
