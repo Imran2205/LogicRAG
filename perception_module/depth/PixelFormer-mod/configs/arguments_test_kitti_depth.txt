@@ -1,0 +1,12 @@
+--model_name pixelformer_kittieigen
+--encoder large07
+--dataset kitti
+--input_height 352
+--input_width 1216
+--max_depth 80
+--do_kb_crop
+
+--data_path /data/datasets/KITTI/MOT/testing
+--filenames_file ./data_splits/kitti_lrag_test.txt
+--checkpoint_path ../../../LogicRAG_Data/model_weights/PixelFormer/kitti.pth
+--output ../../../track_in_kitti_test/

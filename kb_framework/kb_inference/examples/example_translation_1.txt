@@ -1,0 +1,177 @@
+Question: "Is there a red car near the right?"
+Queries: "TypeOf(x, Car)^ColorOf(x, Red)^InitialLocation(x, Right)"
+
+Question: "Is there a Black Car in the front in the initial frames that moves to the right?"
+Queries: "TypeOf(x, Car)^ColorOf(x, Black)^InitialLocation(x, Front)^Move(x)^LastLocation(x, Right)"
+
+Question: "Can you spot a trafficsign in the front that shifts to the right in the later frames due to the camera movement?"
+Queries: "TrafficSign(x)^InitialLocation(x, Front)^LastLocation(x, Right)"
+
+Question: "Does the White Car move from front to the left of the scene?"
+Queries: "TypeOf(x, Car)^ColorOf(x, White)^InitialLocation(x, Front)^LastLocation(x, Left)^Move(x)"
+
+Question: "Does the position of the White Car change from front to the left of the scene?"
+Queries: "TypeOf(x, Car)^ColorOf(x, White)^InitialLocation(x, Front)^LastLocation(x, Left)"
+
+Question: "Can you spot a pedestrian on the left?"
+Queries: "Pedestrian(x)^InitialLocation(x, Left)"
+
+Question: "Is there any police car on the scene?"
+Queries: "Vehicles(x)^TypeOf(x, PoliceCar)"
+
+Question: "Is there another motorcycle moving at a constant speed in front of the police car?"
+Queries: "Motorcycle(x)^ConstantSpeed(x)^InitialLocation(x, Front)^TypeOf(y, PoliceCar)"
+
+Question: "Does the police car get close to an overhanging rail track?"
+Queries: "TypeOf(x, PoliceCar)^Vehicles(x)^ComeClose(x, y)^TypeOf(y, RailTrack)"
+
+Question: "Does the police car approach an intersection with traffic lights?"
+Queries: "TypeOf(x, PoliceCar)^Vehicles(x)^Move(x)^IsTrafficlight(y)^DistanceDecrease(x, y)"
+
+Question: "Is there a pedestrian on the right walking at a fixed pace?"
+Queries: "Pedestrian(x)^InitialLocation(x, Right)^FixedPace(x)^Walk(x)"
+
+Question: "Are there two pedestrians walking on the right?"
+Queries: "Pedestrian(x)^Walk(x)^InitialLocation(x, Right)^Pedestrian(y)^Walk(y)^InitialLocation(y, Right)"
+
+Question: "Is there a pedestrian on the right walking at a fixed pace?"
+Queries: "Pedestrian(x)^InitialLocation(x, Right)^FixedPace(x)^Walk(x)"
+
+Question: "Is there a pedestrian walking on the right?"
+Queries: "Pedestrian(x)^Walk(x)^InitialLocation(x, Right)"
+
+Question: "Can you spot a pedestrian walking on the right?"
+Queries: "Pedestrian(x)^Walk(x)^InitialLocation(x, Right)"
+
+Question: "Are there pedestrians in front of the white car?"
+Queries: "Pedestrian(x)^TypeOf(y, Car)^ColorOf(y, White)^InitialLocation(x, Front)"
+
+Question: "Can you see any pedestrians in front of the white car?"
+Queries: "Pedestrian(x)^InitialLocation(x, Front)^TypeOf(y, Car)^ColorOf(y, White)"
+
+Question: "Is there any pedestrian walking on the left?"
+Queries: "Pedestrian(x)^Walk(x)^InitialLocation(x, Left)"
+
+Question: "Can you spot a pedestrian on the right of the white car?"
+Queries: "Pedestrian(x)^TypeOf(y, Car)^ColorOf(y, White)^InitialLocation(x, Right)"
+
+Question: "Do the speeds of the vehicles on the right remain unchanged?"
+Queries: "Vehicles(x)^InitialLocation(x, Right)^ConstantSpeed(x)"
+
+Question: "Is the pedestrian in front of the white car?"
+Queries: "Pedestrian(x)^InitialLocation(x, Front)^TypeOf(y, Car)^ColorOf(y, White)"
+
+Question: "Is the person with the motorcycle on the right of the white car?"
+Queries: "Person(x)^On(x, y)^TypeOf(y, Motorcycle)^InitialLocation(x, Right)"
+
+Question: "Is there a sidewalk on the left of the white car?"
+Queries: "TypeOf(x, Car)^ColorOf(x, White)^Sidewalk(y)^InitialLocation(y, Left)"
+
+Question: "Are there trees on the right of the white car?"
+Queries: "Vegetation(x)^InitialLocation(x, Right)^TypeOf(y, Car)^ColorOf(y, White)"
+
+Question: "Is there a building on the right of the white car?"
+Queries: "Building(x)^InitialLocation(x, Right)^TypeOf(y, Car)^ColorOf(y, White)"
+
+Question: "Is the pedestrian on the right of the white car"
+Queries: "Pedestrian(x)^InitialLocation(x, Right)^TypeOf(y, Car)^ColorOf(y, White)"
+
+Question: "Is there a pedestrian at the right of the white car?"
+Queries: "Pedestrian(x)^InitialLocation(x, Right)^TypeOf(y, Car)^ColorOf(y, White)"
+
+Question: "Is there a person on the left of the white car?"
+Queries: "Pedestrian(x)^InitialLocation(x, Left)^TypeOf(y, Car)^ColorOf(y, White)"
+
+Question: "Is there a sidewalk on the left of the white car?"
+Queries: "TypeOf(x, Car)^ColorOf(x, White)^Sidewalk(y)^InitialLocation(y, Left)"
+
+Question: "Is the person with the motorcycle at the front of the white car?"
+Queries: "Pedestrian(x)^TypeOf(y, Motorcycle)^InitialLocation(x, Front)^InitialLocation(y, Front)"
+
+Question: "Is the motorcycle on the right of the white car?,
+Queries: "TypeOf(x, Motorcycle)^TypeOf(y, Car)^ColorOf(y, White)^InitialLocation(x, Right)"
+
+Question: "Is there a person on the left of the white car?"
+Queries: "Person(x)^InitialLocation(x, Left)^TypeOf(y, Car)^ColorOf(y, White)"
+
+Question: "Is there a motorcycle on the left of the white car?"
+Queries: "TypeOf(x, Motorcycle)^InitialLocation(x, Left)^TypeOf(y, Car)^ColorOf(y, White)"
+
+Question: "Are there two cars on the right of the police car that disappear from the scene?"
+Queries: "Vehicles(x)^TypeOf(x, Car)^TypeOf(y, PoliceCar)^InitialLocation(x, Right)^Disappear(x)"
+
+Question: "Is the grey truck on the right of the white car?"
+Queries: "TypeOf(x, Truck)^ColorOf(x, Grey)^TypeOf(y, Car)^ColorOf(y, White)^InitialLocation(x, Right)"
+
+Question: "Are there some vehicles on the right of the white car?"
+Queries: "Vehicles(x)^TypeOf(x, Car)^InitialLocation(x, Right)"
+
+Question: "Is the red SUV that disappears from the scene on the right of the white car?"
+Queries: "TypeOf(x, SUV)^ColorOf(x, Red)^Disappear(x)^TypeOf(y, Car)^InitialLocation(x, Right)^ColorOf(y, White)"
+
+Question: "Is the black car that appears from the left also at the left of the white car?"
+Queries: "TypeOf(x, Car)^ColorOf(x, Black)^Appear(x)^InitialLocation(x, Left)^TypeOf(y, Car)^ColorOf(y, White)"
+
+Question: "Are there trees on the left of the white car?"
+Queries: "Vegetation(x)^InitialLocation(x, Left)^TypeOf(y, Car)^ColorOf(y, White)"
+
+Question: "Is the white SUV on the left of the white car?"
+Queries: "TypeOf(x, SUV)^ColorOf(x, White)^InitialLocation(x, Left)^TypeOf(y, Car)^ColorOf(y, White)"
+
+Question: "Is there a black car moving at a constant speed on the left?"
+Queries: "TypeOf(x, Car)^ColorOf(x, Black)^ConstantSpeed(x)^InitialLocation(x, Left)"
+
+Question: "Is there a motorcycle moving at a constant speed in front of the police car?"
+Queries: "TypeOf(x, Motorcycle)^Vehicles(x)^ConstantSpeed(x)^InitialLocation(x, Front)^TypeOf(y, PoliceCar)"
+
+Question: "Is there a person visible in front of the police car?"
+Queries: "Person(x)^InitialLocation(x, Front)^TypeOf(y, PoliceCar)"
+
+Question: "Can you spot a gray car that moves at a constant speed in front of the police car?"
+Queries: "TypeOf(x, Car)^ColorOf(x, Gray)^InitialLocation(x, Front)^TypeOf(y, PoliceCar)^ConstantSpeed(x)"
+
+Question: "Can you spot a blue SUV in front of the white car?"
+Queries: "TypeOf(x, SUV)^ColorOf(x, Blue)^InitialLocation(x, Front)^TypeOf(y, Car)^ColorOf(y, White)"
+
+Question: "Are there some vehicles at the front of the white car?"
+Queries: "Vehicles(x)^TypeOf(x, Car)^TypeOf(y, Car)^ColorOf(y, White)^InitialLocation(x, Front)"
+
+Question: "Is the blue SUV in front of the white car?"
+Queries: "TypeOf(x, SUV)^ColorOf(x, Blue)^TypeOf(y, Car)^ColorOf(y, White)^InitialLocation(x, Front)"
+
+Question: "Does the car move at a constant speed?"
+Queries: "Vehicles(x)^TypeOf(x, Car)^ConstantSpeed(x)"
+
+Question: "Is there a motorcycle on the right?"
+Queries: "TypeOf(x, Motorcycle)^InitialLocation(x, Right)"
+
+Question: "Does the white van move at a constant speed?"
+Queries: "TypeOf(x, Van)^ColorOf(x, White)^ConstantSpeed(x)"
+
+Question: "Does the orange bus move at a constant speed and disappear from the scene?"
+Queries: "TypeOf(x, Bus)^ColorOf(x, Orange)^ConstantSpeed(x)^Disappear(x)"
+
+Question: "Does the orange truck move at a constant speed and disappear from the scene?"
+Queries: "TypeOf(x, Truck)^ColorOf(x, Orange)^ConstantSpeed(x)^Disappear(x)"
+
+Question: "Can you spot a brown car at the front of the police car in the initial frames?"
+Queries: "TypeOf(x, Car)^ColorOf(x, Brown)^InitialLocation(x, Front)^TypeOf(y, PoliceCar)"
+
+Question: "Can you spot a white SUV behind the black car?"
+Queries: "TypeOf(x, SUV)^ColorOf(x, White)^TypeOf(y, Car)^ColorOf(y, Black)"
+
+Question: "Does the police car get close to the pedestrian on the left?"
+Queries: "TypeOf(x, PoliceCar)^Vehicles(x)^Pedestrian(y)^InitialLocation(y, Left)^ComeClose(x, y)"
+
+Question: "Does the police car get close to traffic lights at an intersection?"
+Queries: "TypeOf(x, PoliceCar)^Vehicles(x)^ComeClose(x, y)^Trafficlight(y)"
+
+Question: "Does the police car at the center approach traffic lights at an intersection?"
+Queries: "TypeOf(x, PoliceCar)^InitialLocation(x, NearFront)^Vehicles(x)^DistanceDecrease(x, y)^Trafficlight(y)"
+
+"Does the police car approach an intersection with traffic lights?"
+"TypeOf(x, PoliceCar)^Vehicles(x)^Move(x)^Trafficlight(y)^DistanceDecrease(x, y)"
+
+
+
+

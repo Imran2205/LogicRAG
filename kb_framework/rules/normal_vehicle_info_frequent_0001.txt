@@ -1,0 +1,2 @@
+TypeOf(Vehicles_0, Car)
+ColorOf(Vehicles_0, Gray)
