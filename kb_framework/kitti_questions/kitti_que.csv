@@ -90,9 +90,9 @@ Video,Frame,Questions,Human
 0008,000140-000149,can you spot a White Car in the front of the scene?,1
 0008,000140-000149,Does the position of the White car change from front to left?,1
 0008,000140-000149,Does the speed of the White Car remain unchanged?,1
-0008,000140-000149,Is there a Black Wagon in the front?,1
-0008,000140-000149,Does the speed of the Black Wagon in the front remain unchanged?,1
-0008,000140-000149,Does the distance between Black Wagon in the front and the Blue Van on the left increase?,1
+0008,000140-000149,Is there a Red Wagon in the front?,1
+0008,000140-000149,Does the speed of the Red Wagon in the front remain unchanged?,1
+0008,000140-000149,Does the distance between Red Wagon in the front and the Blue Van on the left increase?,1
 0010,000000-000009,Is there a Red Car in the front that moves to the right of the scene?,1
 0010,000000-000009,Is there a White Car on the left of the scene?,1
 0010,000000-000009,Can you spot a Blue Car in the front?,1
