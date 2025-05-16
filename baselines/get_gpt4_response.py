@@ -161,6 +161,6 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    MODEL_NAME = "gpt-4o"  # gpt-4o-2024-08-06
+    MODEL_NAME = "gpt-4o-2024-08-06"  # gpt-4o-2024-08-06 # gpt-4-vision-preview
 
     get_answers_gpt4(args.csv, args.frames_dir, args.output, args.log_dir, MODEL_NAME)
