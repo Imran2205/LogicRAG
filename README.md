@@ -89,7 +89,9 @@ python inference_in_kb.py \
 ## Usage
 
 The Logic-RAG pipeline consists of several components that need to be run sequentially to generate the knowledge base
-and perform inference. Soon, we will share a Google Colab Notebook for running demo. This notebook will combine all the
+and perform inference. 
+
+[//]: # (Soon, we will share a Google Colab Notebook for running demo. This notebook will combine all the)
 steps.
 
 ### 1. Perception Module
